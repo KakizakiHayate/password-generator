@@ -32,19 +32,25 @@ Future<void> _initializeServices(ProviderContainer container) async {
   final authService = container.read(authServiceProvider);
   await authService.ensureAuthenticated();
 
+  final crashlyticsService = container.read(crashlyticsServiceProvider);
+
   // 2. ユーザーIDをAnalytics/Crashlyticsに設定
+  // 3. Crashlyticsを初期化（エラーハンドラを設定）
+  // 上記2,3を並行して実行
+  final futures = <Future<void>>[
+    crashlyticsService.initialize(),
+  ];
+
   final userId = authService.userId;
   if (userId != null) {
     final analyticsService = container.read(analyticsServiceProvider);
-    final crashlyticsService = container.read(crashlyticsServiceProvider);
-
-    await analyticsService.setUserId(userId);
-    await crashlyticsService.setUserIdentifier(userId);
+    futures.addAll([
+      analyticsService.setUserId(userId),
+      crashlyticsService.setUserIdentifier(userId),
+    ]);
   }
 
-  // 3. Crashlyticsを初期化（エラーハンドラを設定）
-  final crashlyticsService = container.read(crashlyticsServiceProvider);
-  await crashlyticsService.initialize();
+  await Future.wait(futures);
 }
 
 class MyApp extends StatelessWidget {
