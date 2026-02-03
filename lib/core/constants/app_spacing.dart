@@ -1,5 +1,5 @@
 /// アプリ全体で使用するスペーシング定数
-abstract class AppSpacing {
+abstract final class AppSpacing {
   static const double xs = 4.0;
   static const double sm = 8.0;
   static const double md = 16.0;

@@ -36,22 +36,22 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Firebase
-  firebase_core: ^3.8.0
-  firebase_analytics: ^11.3.5
-  firebase_crashlytics: ^4.2.1
-  firebase_auth: ^5.3.3
+  firebase_core: ^3.15.2
+  firebase_analytics: ^11.6.0
+  firebase_crashlytics: ^4.3.10
+  firebase_auth: ^5.7.0
 
   # State Management
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
 
   # Storage
-  shared_preferences: ^2.3.3
+  shared_preferences: ^2.5.4
 
   # Utilities
-  intl: ^0.20.1
+  intl: ^0.20.2
   gap: ^3.0.1
-  google_fonts: ^6.2.1
+  google_fonts: ^6.3.3
 
   # Code Generation (runtime annotations)
   freezed_annotation: ^2.4.4
@@ -69,10 +69,10 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # Code Generation
-  build_runner: ^2.4.13
-  riverpod_generator: ^2.6.3
-  freezed: ^2.5.7
-  json_serializable: ^6.8.0
+  build_runner: ^2.5.4
+  riverpod_generator: ^2.6.4
+  freezed: ^2.5.8
+  json_serializable: ^6.9.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
