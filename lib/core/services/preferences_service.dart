@@ -13,7 +13,49 @@ PreferencesService preferencesService(Ref ref) {
 class PreferencesService {
   SharedPreferences? _prefs;
 
-  /// 遅延初期化
+  // ============================================================
+  // 静的フィールドとメソッド（DIコンテナ構築前に使用）
+  // ============================================================
+
+  static SharedPreferences? _staticPrefs;
+
+  /// 静的初期化（main.dart等で一度だけ呼び出す）
+  static Future<void> initializeStatic() async {
+    _staticPrefs ??= await SharedPreferences.getInstance();
+  }
+
+  /// 文字列を読み取る（静的メソッド）
+  static String? readString(String key) {
+    assert(
+      _staticPrefs != null,
+      'PreferencesService.initializeStatic() must be called first',
+    );
+    return _staticPrefs!.getString(key);
+  }
+
+  /// 真偽値を読み取る（静的メソッド）
+  static bool readBool(String key, {bool defaultValue = false}) {
+    assert(
+      _staticPrefs != null,
+      'PreferencesService.initializeStatic() must be called first',
+    );
+    return _staticPrefs!.getBool(key) ?? defaultValue;
+  }
+
+  /// 整数を読み取る（静的メソッド）
+  static int? readInt(String key) {
+    assert(
+      _staticPrefs != null,
+      'PreferencesService.initializeStatic() must be called first',
+    );
+    return _staticPrefs!.getInt(key);
+  }
+
+  // ============================================================
+  // インスタンスメソッド（initialize()後に使用）
+  // ============================================================
+
+  /// インスタンス初期化（アプリ起動時に一度だけ呼び出す）
   Future<void> initialize() async {
     _prefs ??= await SharedPreferences.getInstance();
   }
@@ -28,107 +70,68 @@ class PreferencesService {
     return _prefs!;
   }
 
-  // ============================================================
-  // 静的メソッド（main.dart等、DIコンテナ構築前に使用）
-  // ============================================================
-
-  /// 文字列を読み取る（静的メソッド）
-  static Future<String?> readString(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(key);
-  }
-
-  /// 真偽値を読み取る（静的メソッド）
-  static Future<bool> readBool(String key, {bool defaultValue = false}) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(key) ?? defaultValue;
-  }
-
-  /// 整数を読み取る（静的メソッド）
-  static Future<int?> readInt(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(key);
-  }
-
-  // ============================================================
-  // インスタンスメソッド（遅延初期化後に使用）
-  // ============================================================
-
   /// 文字列を保存
-  Future<bool> setString(String key, String value) async {
-    await initialize();
+  Future<bool> setString(String key, String value) {
     return _preferences.setString(key, value);
   }
 
   /// 文字列を取得
-  Future<String?> getString(String key) async {
-    await initialize();
+  String? getString(String key) {
     return _preferences.getString(key);
   }
 
   /// 真偽値を保存
-  Future<bool> setBool(String key, bool value) async {
-    await initialize();
+  Future<bool> setBool(String key, bool value) {
     return _preferences.setBool(key, value);
   }
 
   /// 真偽値を取得
-  Future<bool?> getBool(String key) async {
-    await initialize();
+  bool? getBool(String key) {
     return _preferences.getBool(key);
   }
 
   /// 整数を保存
-  Future<bool> setInt(String key, int value) async {
-    await initialize();
+  Future<bool> setInt(String key, int value) {
     return _preferences.setInt(key, value);
   }
 
   /// 整数を取得
-  Future<int?> getInt(String key) async {
-    await initialize();
+  int? getInt(String key) {
     return _preferences.getInt(key);
   }
 
   /// 浮動小数点数を保存
-  Future<bool> setDouble(String key, double value) async {
-    await initialize();
+  Future<bool> setDouble(String key, double value) {
     return _preferences.setDouble(key, value);
   }
 
   /// 浮動小数点数を取得
-  Future<double?> getDouble(String key) async {
-    await initialize();
+  double? getDouble(String key) {
     return _preferences.getDouble(key);
   }
 
   /// 文字列リストを保存
-  Future<bool> setStringList(String key, List<String> value) async {
-    await initialize();
+  Future<bool> setStringList(String key, List<String> value) {
     return _preferences.setStringList(key, value);
   }
 
   /// 文字列リストを取得
-  Future<List<String>?> getStringList(String key) async {
-    await initialize();
+  List<String>? getStringList(String key) {
     return _preferences.getStringList(key);
   }
 
   /// キーを削除
-  Future<bool> remove(String key) async {
-    await initialize();
+  Future<bool> remove(String key) {
     return _preferences.remove(key);
   }
 
   /// すべてのキーを削除
-  Future<bool> clear() async {
-    await initialize();
+  Future<bool> clear() {
     return _preferences.clear();
   }
 
   /// キーが存在するか確認
-  Future<bool> containsKey(String key) async {
-    await initialize();
+  bool containsKey(String key) {
     return _preferences.containsKey(key);
   }
 }
