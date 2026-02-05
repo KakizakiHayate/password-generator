@@ -23,7 +23,6 @@ analyzer:
     - "**/*.mocks.dart"
     - "build/**"
     - ".dart_tool/**"
-    - "test/**"
 
 linter:
   rules:

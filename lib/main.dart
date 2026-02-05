@@ -14,46 +14,47 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // ProviderContainerを作成し、アプリ起動前の初期化処理を実行
+  final container = ProviderContainer();
+  await _initializeServices(container);
+
   runApp(
-    const ProviderScope(
-      child: MyApp(),
+    UncontrolledProviderScope(
+      container: container,
+      child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends ConsumerStatefulWidget {
-  const MyApp({super.key});
+/// アプリ起動前のサービス初期化処理
+Future<void> _initializeServices(ProviderContainer container) async {
+  // 1. 認証を確保
+  final authService = container.read(authServiceProvider);
+  await authService.ensureAuthenticated();
 
-  @override
-  ConsumerState<MyApp> createState() => _MyAppState();
+  final crashlyticsService = container.read(crashlyticsServiceProvider);
+
+  // 2. ユーザーIDをAnalytics/Crashlyticsに設定
+  // 3. Crashlyticsを初期化（エラーハンドラを設定）
+  // 上記2,3を並行して実行
+  final futures = <Future<void>>[
+    crashlyticsService.initialize(),
+  ];
+
+  final userId = authService.userId;
+  if (userId != null) {
+    final analyticsService = container.read(analyticsServiceProvider);
+    futures.addAll([
+      analyticsService.setUserId(userId),
+      crashlyticsService.setUserIdentifier(userId),
+    ]);
+  }
+
+  await Future.wait(futures);
 }
 
-class _MyAppState extends ConsumerState<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    _initializeServices();
-  }
-
-  Future<void> _initializeServices() async {
-    // 1. 認証を確保
-    final authService = ref.read(authServiceProvider);
-    await authService.ensureAuthenticated();
-
-    // 2. ユーザーIDをAnalytics/Crashlyticsに設定
-    final userId = authService.userId;
-    if (userId != null) {
-      final analyticsService = ref.read(analyticsServiceProvider);
-      final crashlyticsService = ref.read(crashlyticsServiceProvider);
-
-      await analyticsService.setUserId(userId);
-      await crashlyticsService.setUserIdentifier(userId);
-    }
-
-    // 3. Crashlyticsを初期化（エラーハンドラを設定）
-    final crashlyticsService = ref.read(crashlyticsServiceProvider);
-    await crashlyticsService.initialize();
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

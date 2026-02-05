@@ -23,6 +23,21 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Generate dummy firebase_options.dart
+        run: |
+          cat > lib/firebase_options.dart << 'DART'
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform => const FirebaseOptions(
+              apiKey: 'dummy',
+              appId: 'dummy',
+              messagingSenderId: 'dummy',
+              projectId: 'dummy',
+            );
+          }
+          DART
+
       - name: Get dependencies
         run: flutter pub get
 
@@ -51,6 +66,21 @@ jobs:
           flutter-version-file: pubspec.yaml
           channel: 'stable'
           cache: true
+
+      - name: Generate dummy firebase_options.dart
+        run: |
+          cat > lib/firebase_options.dart << 'DART'
+          import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+
+          class DefaultFirebaseOptions {
+            static FirebaseOptions get currentPlatform => const FirebaseOptions(
+              apiKey: 'dummy',
+              appId: 'dummy',
+              messagingSenderId: 'dummy',
+              projectId: 'dummy',
+            );
+          }
+          DART
 
       - name: Get dependencies
         run: flutter pub get

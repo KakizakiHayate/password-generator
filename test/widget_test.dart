@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_fast_starter/main.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:flutter_fast_starter/main.dart';
 
 void main() {
   testWidgets('HomePage displays correctly', (WidgetTester tester) async {
