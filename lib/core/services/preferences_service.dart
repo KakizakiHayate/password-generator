@@ -20,12 +20,13 @@ class PreferencesService {
 
   /// SharedPreferencesインスタンスを取得（初期化済みであること）
   SharedPreferences get _preferences {
-    if (_prefs == null) {
+    final prefs = _prefs;
+    if (prefs == null) {
       throw StateError(
         'PreferencesService is not initialized. Call initialize() first.',
       );
     }
-    return _prefs!;
+    return prefs;
   }
 
   // ============================================================

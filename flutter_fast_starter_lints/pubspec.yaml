@@ -1,0 +1,12 @@
+name: flutter_fast_starter_lints
+description: Custom lint rules for Flutter Fast Starter
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  analyzer: ^7.5.0
+  analyzer_plugin: ^0.13.0
+  custom_lint_builder: ^0.7.0
