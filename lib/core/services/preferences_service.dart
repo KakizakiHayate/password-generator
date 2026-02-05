@@ -20,10 +20,11 @@ class PreferencesService {
 
   /// SharedPreferencesインスタンスを取得（初期化済みであること）
   static SharedPreferences get _instance {
-    if (_prefs == null) {
+    final prefs = _prefs;
+    if (prefs == null) {
       throw StateError('PreferencesService.initialize() must be called first');
     }
-    return _prefs!;
+    return prefs;
   }
 
   // ============================================================
