@@ -8,6 +8,7 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
+  cloud_firestore: ^5.5.0
   cupertino_icons: ^1.0.8
   firebase_analytics: ^11.6.0
   firebase_auth: ^5.7.0

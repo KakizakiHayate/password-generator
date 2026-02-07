@@ -6,13 +6,12 @@ import 'core/services/analytics_service.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/crashlytics_service.dart';
 import 'firebase_options.dart';
+import 'views/screens/settings_test_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // ProviderContainerを作成し、アプリ起動前の初期化処理を実行
   final container = ProviderContainer();
@@ -79,10 +78,31 @@ class HomePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Flutter Starter Kit'),
       ),
-      body: const Center(
-        child: Text(
-          'Hello Starter Kit',
-          style: TextStyle(fontSize: 24),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Hello Starter Kit', style: TextStyle(fontSize: 24)),
+            const SizedBox(height: 32),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsTestScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.science),
+              label: const Text('Firestore動作テスト'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
