@@ -288,9 +288,7 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
     try {
       await viewModel.updateNotificationEnabled(enabled);
       if (mounted) {
-        messenger.showSnackBar(
-          const SnackBar(content: Text('通知設定を更新しました')),
-        );
+        messenger.showSnackBar(const SnackBar(content: Text('通知設定を更新しました')));
       }
     } catch (e) {
       if (mounted) {

@@ -16,11 +16,7 @@ class UserSettingsViewModel extends _$UserSettingsViewModel {
   Future<UserSettings> build() async {
     final firestore = ref.watch(firestoreServiceProvider);
     final userId = _requireUserId();
-    final data = await firestore.getDocument(
-      userId,
-      'settings',
-      'default',
-    );
+    final data = await firestore.getDocument(userId, 'settings', 'default');
     return data != null ? UserSettings.fromJson(data) : const UserSettings();
   }
 
@@ -38,12 +34,9 @@ class UserSettingsViewModel extends _$UserSettingsViewModel {
   Future<void> updateDisplayName(String displayName) async {
     final firestore = ref.read(firestoreServiceProvider);
     final userId = _requireUserId();
-    await firestore.updateDocument(
-      userId,
-      'settings',
-      'default',
-      {'displayName': displayName},
-    );
+    await firestore.updateDocument(userId, 'settings', 'default', {
+      'displayName': displayName,
+    });
     ref.invalidateSelf();
   }
 
@@ -51,12 +44,9 @@ class UserSettingsViewModel extends _$UserSettingsViewModel {
   Future<void> updateNotificationEnabled(bool enabled) async {
     final firestore = ref.read(firestoreServiceProvider);
     final userId = _requireUserId();
-    await firestore.updateDocument(
-      userId,
-      'settings',
-      'default',
-      {'notificationsEnabled': enabled},
-    );
+    await firestore.updateDocument(userId, 'settings', 'default', {
+      'notificationsEnabled': enabled,
+    });
     ref.invalidateSelf();
   }
 
@@ -64,12 +54,9 @@ class UserSettingsViewModel extends _$UserSettingsViewModel {
   Future<void> updateDarkModeEnabled(bool enabled) async {
     final firestore = ref.read(firestoreServiceProvider);
     final userId = _requireUserId();
-    await firestore.updateDocument(
-      userId,
-      'settings',
-      'default',
-      {'darkModeEnabled': enabled},
-    );
+    await firestore.updateDocument(userId, 'settings', 'default', {
+      'darkModeEnabled': enabled,
+    });
     ref.invalidateSelf();
   }
 
@@ -77,12 +64,9 @@ class UserSettingsViewModel extends _$UserSettingsViewModel {
   Future<void> updateLanguage(String language) async {
     final firestore = ref.read(firestoreServiceProvider);
     final userId = _requireUserId();
-    await firestore.updateDocument(
-      userId,
-      'settings',
-      'default',
-      {'language': language},
-    );
+    await firestore.updateDocument(userId, 'settings', 'default', {
+      'language': language,
+    });
     ref.invalidateSelf();
   }
 
@@ -111,6 +95,8 @@ Stream<UserSettings> userSettingsStream(Ref ref) {
   }
   return firestore
       .watchDocument(userId, 'settings', 'default')
-      .map((data) =>
-          data != null ? UserSettings.fromJson(data) : const UserSettings());
+      .map(
+        (data) =>
+            data != null ? UserSettings.fromJson(data) : const UserSettings(),
+      );
 }

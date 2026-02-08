@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'flutter-fast-starter.firebasestorage.app',
     iosBundleId: 'com.h.dev.flutterFastStarter',
   );
-
 }

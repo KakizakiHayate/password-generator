@@ -48,3 +48,8 @@ app.*.map.json
 **/GoogleService-Info.plist
 **/google-services.json
 firebase.json
+
+# Fastlane credentials
+ios/fastlane/.env
+ios/fastlane/report.xml
+ios/fastlane/README.md

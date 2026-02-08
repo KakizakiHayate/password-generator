@@ -17,12 +17,7 @@ Future<void> main() async {
   final container = ProviderContainer();
   await _initializeServices(container);
 
-  runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const MyApp(),
-    ),
-  );
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
 
 /// アプリ起動前のサービス初期化処理
@@ -36,9 +31,7 @@ Future<void> _initializeServices(ProviderContainer container) async {
   // 2. ユーザーIDをAnalytics/Crashlyticsに設定
   // 3. Crashlyticsを初期化（エラーハンドラを設定）
   // 上記2,3を並行して実行
-  final futures = <Future<void>>[
-    crashlyticsService.initialize(),
-  ];
+  final futures = <Future<void>>[crashlyticsService.initialize()];
 
   final userId = authService.userId;
   if (userId != null) {

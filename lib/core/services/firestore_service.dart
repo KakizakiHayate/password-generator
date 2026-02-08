@@ -44,10 +44,7 @@ class FirestoreService {
   }
 
   /// ユーザーデータを更新
-  Future<void> updateUserData(
-    String userId,
-    Map<String, dynamic> data,
-  ) async {
+  Future<void> updateUserData(String userId, Map<String, dynamic> data) async {
     await userDoc(userId).update(data);
   }
 
@@ -90,9 +87,10 @@ class FirestoreService {
       'updatedAt': FieldValue.serverTimestamp(),
       if (!merge) 'createdAt': FieldValue.serverTimestamp(),
     };
-    await userCollection(userId, collectionName)
-        .doc(docId)
-        .set(dataWithTimestamp, SetOptions(merge: merge));
+    await userCollection(
+      userId,
+      collectionName,
+    ).doc(docId).set(dataWithTimestamp, SetOptions(merge: merge));
   }
 
   /// ドキュメントを取得
@@ -119,9 +117,10 @@ class FirestoreService {
       ...data,
       'updatedAt': FieldValue.serverTimestamp(),
     };
-    await userCollection(userId, collectionName)
-        .doc(docId)
-        .update(dataWithTimestamp);
+    await userCollection(
+      userId,
+      collectionName,
+    ).doc(docId).update(dataWithTimestamp);
   }
 
   /// ドキュメントを削除
@@ -139,7 +138,8 @@ class FirestoreService {
     String collectionName, {
     Query<Map<String, dynamic>> Function(
       CollectionReference<Map<String, dynamic>>,
-    )? queryBuilder,
+    )?
+    queryBuilder,
   }) async {
     Query<Map<String, dynamic>> query = userCollection(userId, collectionName);
     if (queryBuilder != null) {
@@ -155,16 +155,17 @@ class FirestoreService {
     String collectionName, {
     Query<Map<String, dynamic>> Function(
       CollectionReference<Map<String, dynamic>>,
-    )? queryBuilder,
+    )?
+    queryBuilder,
   }) {
     Query<Map<String, dynamic>> query = userCollection(userId, collectionName);
     if (queryBuilder != null) {
       query = queryBuilder(userCollection(userId, collectionName));
     }
     return query.snapshots().map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList(),
-        );
+      (snapshot) =>
+          snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList(),
+    );
   }
 
   /// 単一ドキュメントをリアルタイムで監視
@@ -173,15 +174,14 @@ class FirestoreService {
     String collectionName,
     String docId,
   ) {
-    return userCollection(userId, collectionName)
-        .doc(docId)
-        .snapshots()
-        .map((snapshot) {
-          if (!snapshot.exists) return null;
-          final data = snapshot.data();
-          if (data == null) return null;
-          return {'id': snapshot.id, ...data};
-        });
+    return userCollection(userId, collectionName).doc(docId).snapshots().map((
+      snapshot,
+    ) {
+      if (!snapshot.exists) return null;
+      final data = snapshot.data();
+      if (data == null) return null;
+      return {'id': snapshot.id, ...data};
+    });
   }
 
   // ============================================================
@@ -189,9 +189,7 @@ class FirestoreService {
   // ============================================================
 
   /// バッチ書き込みを実行
-  Future<void> runBatch(
-    void Function(WriteBatch batch) operations,
-  ) async {
+  Future<void> runBatch(void Function(WriteBatch batch) operations) async {
     final batch = _firestore.batch();
     operations(batch);
     await batch.commit();
