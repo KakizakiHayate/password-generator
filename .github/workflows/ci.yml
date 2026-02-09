@@ -40,10 +40,16 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Get flutter_fast_starter_lints dependencies
+      - name: Get custom lint dependencies
         run: |
-          cd flutter_fast_starter_lints
-          dart pub get
+          for dir in */; do
+            if [ -f "$dir/pubspec.yaml" ] && grep -q "custom_lint_builder" "$dir/pubspec.yaml"; then
+              echo "Found custom lint package in $dir"
+              cd "$dir"
+              dart pub get
+              cd ..
+            fi
+          done
 
       - name: Run flutter analyze
         run: flutter analyze

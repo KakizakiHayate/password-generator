@@ -84,11 +84,20 @@ flutter run
 - [ ] `pubspec.yaml` — `name: flutter_fast_starter` を `name: my_todo_app` に変更
 - [ ] `pubspec.yaml` — `description` をアプリの説明に変更
 - [ ] `lib/` と `test/` の全 `.dart` ファイル — `package:flutter_fast_starter` を `package:my_todo_app` に一括置換
+- [ ] `flutter_fast_starter_lints/` — ディレクトリ名を `my_todo_app_lints/` にリネーム
+- [ ] `flutter_fast_starter_lints/pubspec.yaml` — `name: flutter_fast_starter_lints` を `name: my_todo_app_lints` に変更
+- [ ] `pubspec.yaml` の `dev_dependencies` — `flutter_fast_starter_lints` の名前とパスを変更
 
 ```bash
 # 一括置換コマンド（macOS）
 find lib test -name '*.dart' -exec sed -i '' 's/package:flutter_fast_starter/package:my_todo_app/g' {} +
+
+# カスタム lint パッケージのリネーム
+mv flutter_fast_starter_lints my_todo_app_lints
+sed -i '' 's/flutter_fast_starter_lints/my_todo_app_lints/g' my_todo_app_lints/pubspec.yaml pubspec.yaml
 ```
+
+- [ ] `dart fix --apply lib/ test/` を実行して import 順序を修正（パッケージ名変更で順序が崩れるため）
 
 ### 2. アプリ ID の変更
 
