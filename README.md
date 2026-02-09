@@ -139,6 +139,54 @@ sed -i '' 's/com.h.dev.flutterFastStarter/com.example.mytodo/g' ios/Runner.xcode
 - [ ] この README.md をアプリ固有の内容に書き換え
 - [ ] `CLAUDE.md` の「Project Overview」セクションを書き換え
 
+## セットアップ後の検証手順
+
+チェックリストの作業が完了したら、以下のコマンドを順に実行して正しくセットアップできたことを確認してください。
+
+### 1. ローカル検証
+
+```bash
+# 依存関係の取得
+flutter pub get
+
+# 静的解析（エラーが0件であること）
+dart analyze
+
+# テスト実行（全テストがパスすること）
+flutter test
+```
+
+### 2. CI の検証
+
+```bash
+# GitHub にリポジトリを作成して push
+gh repo create <リポジトリ名> --private --source=. --push
+
+# main ブランチを作成して push（CI のターゲットブランチとして必要）
+git checkout -b main
+git push -u origin main
+
+# develop ブランチに戻り、PR を作成して CI をトリガー
+git checkout develop
+gh pr create --base main --head develop --title "Initial setup" --body "セットアップ検証用"
+
+# CI の結果を確認（Lint Check・Test ともに pass であること）
+gh pr checks <PR番号> --watch
+```
+
+### 3. Fastlane の依存関係
+
+```bash
+cd ios && bundle install
+```
+
+### 4. Firebase の接続（手動）
+
+1. Firebase コンソールで新規プロジェクトを作成
+2. `flutterfire configure` を実行して iOS/Android を選択
+3. Firestore Database を有効化
+4. `flutter run` でアプリが起動することを確認
+
 ## 新機能の追加方法
 
 ### MVVM モジュールの追加
