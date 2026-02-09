@@ -61,12 +61,13 @@ final theme = prefs.getString('theme');
 ### 手順
 
 ```bash
-# 1. クローン
-git clone <repository-url> my-app
+# 1. クローン（develop ブランチを指定）
+git clone -b develop <repository-url> my-app
 cd my-app
 
-# 2. 依存関係インストール
-flutter pub get
+# 2. セットアップスクリプトを実行（パッケージ名・Bundle ID・表示名を自動変更）
+make setup
+# または: ./setup.sh
 
 # 3. Firebase 設定（自分の Firebase プロジェクトに接続）
 flutterfire configure
@@ -77,86 +78,51 @@ flutter run
 
 ## 新規プロジェクト立ち上げチェックリスト
 
-以下の例では、パッケージ名 `my_todo_app`、Bundle ID `com.example.mytodo`、表示名 `My Todo App` として記載しています。
+### Part 1: 自動セットアップ
 
-### 1. パッケージ名の変更
-
-- [ ] `pubspec.yaml` — `name: flutter_fast_starter` を `name: my_todo_app` に変更
-- [ ] `pubspec.yaml` — `description` をアプリの説明に変更
-- [ ] `lib/` と `test/` の全 `.dart` ファイル — `package:flutter_fast_starter` を `package:my_todo_app` に一括置換
-- [ ] `flutter_fast_starter_lints/` — ディレクトリ名を `my_todo_app_lints/` にリネーム
-- [ ] `flutter_fast_starter_lints/pubspec.yaml` — `name: flutter_fast_starter_lints` を `name: my_todo_app_lints` に変更
-- [ ] `pubspec.yaml` の `dev_dependencies` — `flutter_fast_starter_lints` の名前とパスを変更
+セットアップスクリプトが以下をすべて自動で行います。
 
 ```bash
-# 一括置換コマンド（macOS）
-find lib test -name '*.dart' -exec sed -i '' 's/package:flutter_fast_starter/package:my_todo_app/g' {} +
-
-# カスタム lint パッケージのリネーム
-mv flutter_fast_starter_lints my_todo_app_lints
-sed -i '' 's/flutter_fast_starter_lints/my_todo_app_lints/g' my_todo_app_lints/pubspec.yaml pubspec.yaml
+make setup
+# 対話モード: プロジェクト名と表示名を聞かれます
+# 非対話モード: ./setup.sh my_todo_app "My Todo App"
 ```
 
-- [ ] `dart fix --apply lib/ test/` を実行して import 順序を修正（パッケージ名変更で順序が崩れるため）
+**スクリプトが実行する内容:**
 
-### 2. アプリ ID の変更
+| # | 処理 | 対象ファイル |
+|---|------|-------------|
+| 1 | pubspec.yaml のパッケージ名・説明を変更 | `pubspec.yaml` |
+| 2 | lib/ と test/ の import を一括置換 | `lib/**/*.dart`, `test/**/*.dart` |
+| 3 | カスタム lint パッケージのリネーム | `flutter_fast_starter_lints/` → `{名前}_lints/` |
+| 4 | iOS Bundle ID を置換 | `ios/Runner.xcodeproj/project.pbxproj` |
+| 5 | Android Bundle ID を置換 | `android/app/build.gradle.kts` |
+| 6 | Android MainActivity のパッケージ名・ディレクトリを変更 | `android/app/src/main/kotlin/...` |
+| 7 | アプリ表示名を変更 | `ios/Runner/Info.plist`, `AndroidManifest.xml` |
+| 8 | import 順序を自動修正（`dart fix --apply`） | `lib/`, `test/` |
+| 9 | 依存関係を取得（`flutter pub get`） | - |
+| 10 | Firebase プロジェクトを作成（`firebase projects:create`） | - |
+| 11 | FlutterFire で Firebase を接続（`flutterfire configure`） | `lib/firebase_options.dart` |
+| 12 | 静的解析（`flutter analyze`） | - |
+| 13 | テスト実行（`flutter test`） | - |
 
-- [ ] `android/app/build.gradle.kts` — `applicationId` と `namespace` を変更
-- [ ] `ios/Runner.xcodeproj/project.pbxproj` — `PRODUCT_BUNDLE_IDENTIFIER` を一括置換（6箇所: Runner 3箇所 + RunnerTests 3箇所）
+Bundle ID は `com.h.dev.{プロジェクト名のキャメルケース}` の形式で自動生成されます。
+Firebase プロジェクト ID はプロジェクト名のケバブケース（例: `my_todo_app` → `my-todo-app`）で自動生成されます。
+
+> **注意:** Step 10-11 は `firebase` / `flutterfire` CLI が必要です。未インストールの場合はスキップされます。
+
+#### 不要な実装例の削除
+
+テンプレートに含まれる MVVM 実装例が不要な場合は削除してください。
 
 ```bash
-# Android（build.gradle.kts を手動編集）
-# namespace = "com.example.mytodo"
-# applicationId = "com.example.mytodo"
-
-# iOS Bundle ID の一括置換（macOS）
-sed -i '' 's/com.h.dev.flutterFastStarter/com.example.mytodo/g' ios/Runner.xcodeproj/project.pbxproj
+rm -f lib/models/user_settings.dart lib/models/user_settings.freezed.dart lib/models/user_settings.g.dart
+rm -f lib/viewmodels/user_settings_viewmodel.dart lib/viewmodels/user_settings_viewmodel.g.dart
+rm -f lib/views/screens/settings_test_screen.dart
+# lib/main.dart から SettingsTestScreen への参照を手動で削除
 ```
 
-### 3. 表示名の変更
-
-- [ ] `ios/Runner/Info.plist` — `CFBundleDisplayName` と `CFBundleName` を変更
-- [ ] `android/app/src/main/AndroidManifest.xml` — `android:label` を変更
-- [ ] `lib/main.dart` — `MaterialApp` の `title` を変更
-
-### 4. Firebase の再接続
-
-- [ ] `flutterfire configure` を実行して自分の Firebase プロジェクトに接続
-
-### 5. Fastlane の設定
-
-- [ ] `ios/fastlane/.env.example` → `.env` にコピーし、自分の Apple ID 等を記入
-
-### 6. 不要な実装例の削除
-
-- [ ] `lib/models/user_settings.dart`（+ `.freezed.dart`, `.g.dart`）
-- [ ] `lib/viewmodels/user_settings_viewmodel.dart`（+ `.g.dart`）
-- [ ] `lib/views/screens/settings_test_screen.dart`
-- [ ] `lib/main.dart` から `SettingsTestScreen` への参照を削除
-
-### 7. その他
-
-- [ ] この README.md をアプリ固有の内容に書き換え
-- [ ] `CLAUDE.md` の「Project Overview」セクションを書き換え
-
-## セットアップ後の検証手順
-
-チェックリストの作業が完了したら、以下のコマンドを順に実行して正しくセットアップできたことを確認してください。
-
-### 1. ローカル検証
-
-```bash
-# 依存関係の取得
-flutter pub get
-
-# 静的解析（エラーが0件であること）
-dart analyze
-
-# テスト実行（全テストがパスすること）
-flutter test
-```
-
-### 2. CI の検証
+#### CI の検証
 
 ```bash
 # GitHub にリポジトリを作成して push
@@ -174,18 +140,55 @@ gh pr create --base main --head develop --title "Initial setup" --body "セッ�
 gh pr checks <PR番号> --watch
 ```
 
-### 3. Fastlane の依存関係
+### Part 2: 手動（セットアップスクリプト完了後に必要な作業）
+
+#### 2-1. Firebase コンソールでの有効化
+
+セットアップスクリプトが Firebase プロジェクトの作成と FlutterFire の接続を自動で行いますが、以下は Firebase コンソール（https://console.firebase.google.com）での手動操作が必要です。
+
+**Authentication（匿名認証）:**
+1. Firebase コンソール → 作成したプロジェクトを開く
+2. 左メニュー「Authentication」→「始める」
+3. 「ログイン方法」タブ →「匿名」を有効にする
+
+**Firestore Database:**
+1. 左メニュー「Firestore Database」→「データベースの作成」
+2. テストモードで開始（本番前にセキュリティルールを設定）
+
+#### 2-2. `lib/main.dart` の編集
+
+`SettingsTestScreen` への参照を削除し、アプリ固有のホーム画面に変更してください。
+
+#### 2-3. Fastlane の設定
 
 ```bash
-cd ios && bundle install
+cp ios/fastlane/.env.example ios/fastlane/.env
 ```
 
-### 4. Firebase の接続（手動）
+`.env` に以下を記入（Apple Developer アカウントの情報が必要）:
 
-1. Firebase コンソールで新規プロジェクトを作成
-2. `flutterfire configure` を実行して iOS/Android を選択
-3. Firestore Database を有効化
-4. `flutter run` でアプリが起動することを確認
+- `APPLE_ID` — Apple ID
+- `TEAM_ID` — Developer Team ID
+- `APP_IDENTIFIER` — Bundle ID
+
+#### 2-4. その他
+
+- [ ] この README.md をアプリ固有の内容に書き換え
+- [ ] `CLAUDE.md` の「Project Overview」セクションを書き換え
+
+### 検証チェックリスト
+
+すべての作業完了後、以下を確認してください。
+
+| # | 確認項目 | コマンド / 方法 |
+|---|---------|----------------|
+| 1 | 依存関係が取得できる | `flutter pub get` |
+| 2 | 静的解析がエラー0件 | `dart analyze` |
+| 3 | テストが全パス | `flutter test` |
+| 4 | CI が pass | `gh pr checks <PR番号>` |
+| 5 | Fastlane がインストールできる | `cd ios && bundle install` |
+| 6 | アプリが起動する | `flutter run` |
+| 7 | Firestore CRUD が動作する | 設定テスト画面で確認 |
 
 ## 新機能の追加方法
 
@@ -235,6 +238,7 @@ dart run build_runner build --delete-conflicting-outputs
 
 | コマンド | 説明 |
 |---------|------|
+| `make setup` | 新規プロジェクトのセットアップ（リネーム・検証） |
 | `make run` | デバッグ実行 |
 | `make get` | 依存関係取得 |
 | `make clean` | キャッシュクリア + pub get |
@@ -279,19 +283,23 @@ bundle exec fastlane ios beta
 ```
 lib/
 ├── main.dart                        # エントリーポイント
-├── firebase_options.dart            # Firebase 設定（自動生成）
+├── firebase_options.dart            # Firebase 設定（自動生成、gitignore 対象）
 ├── core/
 │   ├── constants/                   # AppSpacing 等の定数
+│   ├── providers/                   # 共通 Provider（サービス層の DI）
 │   ├── services/                    # Auth, Analytics, Crashlytics, Firestore, Preferences
-│   ├── ui/                          # 共通 UI コンポーネント（将来追加）
-│   └── utils/                       # ユーティリティ関数（将来追加）
+│   ├── theme/                       # Cupertino テーマ設定
+│   ├── utils/                       # ユーティリティ関数
+│   └── widgets/                     # 共通ウィジェット（CupertinoToast 等）
 ├── models/                          # Freezed データモデル
 ├── viewmodels/                      # ViewModel（Riverpod codegen）
 ├── views/
-│   └── screens/                     # 画面
-└── ui/
-    ├── theme/                       # テーマ設定（将来追加）
-    └── widgets/                     # 共通ウィジェット（将来追加）
+│   ├── screens/                     # 画面
+│   └── widgets/                     # 画面固有ウィジェット
+├── services/                        # ドメイン固有サービス
+├── providers/                       # ドメイン固有 Provider
+├── routing/                         # ルーティング（go_router）
+└── validators/                      # バリデーション
 ```
 
 ## ドキュメント

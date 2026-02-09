@@ -1,7 +1,12 @@
-.PHONY: help lint lint-fix test test-coverage build-ios build-ipa build-apk build-appbundle run get clean upgrade check ci
+.PHONY: help setup lint lint-fix test test-coverage build-ios build-ipa build-apk build-appbundle run get clean upgrade check ci
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
+
+# ===== セットアップ =====
+## 新規プロジェクトのセットアップ（リネーム・依存取得・検証）
+setup:
+	@./setup.sh
 
 # ===== Lintチェック =====
 ## flutter analyze + custom_lint を一括実行

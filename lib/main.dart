@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/services/analytics_service.dart';
 import 'core/services/auth_service.dart';
 import 'core/services/crashlytics_service.dart';
+import 'core/services/preferences_service.dart';
+import 'core/theme/cupertino_theme.dart';
 import 'firebase_options.dart';
 import 'views/screens/settings_test_screen.dart';
 
@@ -22,6 +24,9 @@ Future<void> main() async {
 
 /// アプリ起動前のサービス初期化処理
 Future<void> _initializeServices(ProviderContainer container) async {
+  // 0. ローカルストレージを初期化
+  await PreferencesService.initialize();
+
   // 1. 認証を確保
   final authService = container.read(authServiceProvider);
   await authService.ensureAuthenticated();
@@ -50,13 +55,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const CupertinoApp(
       title: 'Flutter Starter Kit',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const HomePage(),
+      theme: appTheme,
+      home: HomePage(),
     );
   }
 }
@@ -66,34 +68,26 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Flutter Starter Kit'),
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(
+        middle: Text('Flutter Starter Kit'),
       ),
-      body: Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text('Hello Starter Kit', style: TextStyle(fontSize: 24)),
             const SizedBox(height: 32),
-            ElevatedButton.icon(
+            CupertinoButton.filled(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  CupertinoPageRoute<void>(
                     builder: (context) => const SettingsTestScreen(),
                   ),
                 );
               },
-              icon: const Icon(Icons.science),
-              label: const Text('Firestore動作テスト'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
-                ),
-              ),
+              child: const Text('Firestore動作テスト'),
             ),
           ],
         ),
