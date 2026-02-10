@@ -204,20 +204,49 @@ elif ! command -v flutterfire &> /dev/null; then
   echo -e "  ${RED}スキップ: flutterfire CLI が見つかりません${NC}"
   echo "  インストール: dart pub global activate flutterfire_cli"
 else
-  # 新規作成直後はプロパゲーション待機が必要
+  FLUTTERFIRE_OK=false
+  WAIT_TIMES=(30 30 30)
   if [ "$FIREBASE_CREATED" = true ]; then
-    echo "  Firebase プロジェクトの反映を待機中（15秒）..."
-    sleep 15
+    # 新規作成直後はプロパゲーション待機 + リトライが必要
+    for i in "${!WAIT_TIMES[@]}"; do
+      ATTEMPT=$((i + 1))
+      echo "  Firebase プロジェクトの反映を待機中（${WAIT_TIMES[$i]}秒）... [試行 ${ATTEMPT}/3]"
+      sleep "${WAIT_TIMES[$i]}"
+      if flutterfire configure \
+        --project="$FIREBASE_PROJECT_ID" \
+        --platforms=ios,android \
+        --ios-bundle-id="$BUNDLE_ID" \
+        --android-package-name="$BUNDLE_ID" \
+        --yes 2>&1 | tail -3; then
+        FLUTTERFIRE_OK=true
+        break
+      fi
+      if [ "$ATTEMPT" -lt 3 ]; then
+        echo -e "  ${RED}失敗。リトライします...${NC}"
+      fi
+    done
+  else
+    # 既存プロジェクトの場合は待機不要
+    if flutterfire configure \
+      --project="$FIREBASE_PROJECT_ID" \
+      --platforms=ios,android \
+      --ios-bundle-id="$BUNDLE_ID" \
+      --android-package-name="$BUNDLE_ID" \
+      --yes 2>&1 | tail -3; then
+      FLUTTERFIRE_OK=true
+    fi
   fi
-  if flutterfire configure \
-    --project="$FIREBASE_PROJECT_ID" \
-    --platforms=ios,android \
-    --ios-bundle-id="$BUNDLE_ID" \
-    --android-package-name="$BUNDLE_ID" \
-    --yes 2>&1 | tail -3; then
+
+  if [ "$FLUTTERFIRE_OK" = true ]; then
+    # Firebase 設定ファイルを .gitignore から除外（リポジトリに含めるため）
+    sed -i '' '/# Firebase config files/d' .gitignore
+    sed -i '' '/\*\*\/firebase_options\.dart/d' .gitignore
+    sed -i '' '/\*\*\/GoogleService-Info\.plist/d' .gitignore
+    sed -i '' '/\*\*\/google-services\.json/d' .gitignore
+    sed -i '' '/^firebase\.json$/d' .gitignore
     ok
   else
-    echo -e "  ${RED}警告: FlutterFire の設定に失敗しました${NC}"
+    echo -e "  ${RED}警告: FlutterFire の設定に失敗しました（3回リトライ後）${NC}"
     echo "  手動で実行: flutterfire configure --project=${FIREBASE_PROJECT_ID}"
   fi
 fi
