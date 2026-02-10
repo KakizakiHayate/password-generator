@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/widgets/cupertino_toast.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/user_settings.dart';
 import '../../viewmodels/user_settings_viewmodel.dart';
 
@@ -39,6 +40,7 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final settingsStream = ref.watch(userSettingsStreamProvider);
 
     // ストリーム更新時にローカルステートを同期
@@ -52,8 +54,8 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
     });
 
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Firestore動作テスト'),
+      navigationBar: CupertinoNavigationBar(
+        middle: Text(l10n.settingsTestTitle),
       ),
       child: SafeArea(
         child: settingsStream.when(
@@ -73,21 +75,20 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
                       color: CupertinoColors.systemBlue.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Firestore動作確認',
-                          style: TextStyle(
+                          l10n.settingsTestDescription,
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
-                          '設定を変更して「保存」ボタンを押すと、Firestoreに保存されます。\n'
-                          'アプリを再起動しても設定が保持されることを確認できます。',
-                          style: TextStyle(fontSize: 14),
+                          l10n.settingsTestGuide,
+                          style: const TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
@@ -99,46 +100,54 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: CupertinoColors.systemGreen.withValues(alpha: 0.08),
+                      color: CupertinoColors.systemGreen.withValues(
+                        alpha: 0.08,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Firestoreの現在値（リアルタイム）',
-                          style: TextStyle(
+                        Text(
+                          l10n.firestoreCurrentValues,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 12),
-                        _buildInfoRow('表示名', settings.displayName),
                         _buildInfoRow(
-                          '通知',
-                          settings.notificationsEnabled ? 'ON' : 'OFF',
+                          l10n.labelDisplayName,
+                          settings.displayName,
                         ),
                         _buildInfoRow(
-                          'ダークモード',
-                          settings.darkModeEnabled ? 'ON' : 'OFF',
+                          l10n.labelNotification,
+                          settings.notificationsEnabled ? l10n.on : l10n.off,
                         ),
-                        _buildInfoRow('言語', settings.language),
+                        _buildInfoRow(
+                          l10n.labelDarkMode,
+                          settings.darkModeEnabled ? l10n.on : l10n.off,
+                        ),
+                        _buildInfoRow(l10n.labelLanguage, settings.language),
                         if (settings.id case final id?)
-                          _buildInfoRow('ドキュメントID', id),
+                          _buildInfoRow(l10n.labelDocumentId, id),
                       ],
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // 設定変更フォーム
-                  const Text(
-                    '設定を変更',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    l10n.editSettings,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   CupertinoTextField(
                     controller: _displayNameController,
-                    placeholder: '表示名を入力してください',
+                    placeholder: l10n.placeholderDisplayName,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 12,
@@ -148,7 +157,7 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
 
                   // 通知スイッチ
                   _buildSwitchRow(
-                    '通知を有効にする',
+                    l10n.switchNotification,
                     _notificationsEnabled,
                     (value) {
                       setState(() {
@@ -159,27 +168,28 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
                   const SizedBox(height: 8),
 
                   // ダークモードスイッチ
-                  _buildSwitchRow(
-                    'ダークモードを有効にする',
-                    _darkModeEnabled,
-                    (value) {
-                      setState(() {
-                        _darkModeEnabled = value;
-                      });
-                    },
-                  ),
+                  _buildSwitchRow(l10n.switchDarkMode, _darkModeEnabled, (
+                    value,
+                  ) {
+                    setState(() {
+                      _darkModeEnabled = value;
+                    });
+                  }),
                   const SizedBox(height: 16),
 
                   // 言語選択
-                  const Text('言語', style: TextStyle(fontSize: 16)),
+                  Text(
+                    l10n.labelLanguage,
+                    style: const TextStyle(fontSize: 16),
+                  ),
                   const SizedBox(height: 8),
                   SizedBox(
                     width: double.infinity,
                     child: CupertinoSlidingSegmentedControl<String>(
                       groupValue: _language,
-                      children: const {
-                        'ja': Text('日本語'),
-                        'en': Text('English'),
+                      children: {
+                        'ja': Text(l10n.languageJa),
+                        'en': Text(l10n.languageEn),
                       },
                       onValueChanged: (value) {
                         if (value != null) {
@@ -197,7 +207,7 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
                     width: double.infinity,
                     child: CupertinoButton.filled(
                       onPressed: () => _saveSettings(settings),
-                      child: const Text('Firestoreに保存'),
+                      child: Text(l10n.saveToFirestore),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -207,9 +217,12 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
                   const SizedBox(height: 16),
 
                   // 個別更新テスト
-                  const Text(
-                    '個別更新テスト',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Text(
+                    l10n.individualUpdateTest,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
@@ -219,12 +232,12 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
                       CupertinoButton(
                         onPressed: () =>
                             _updateNotification(!settings.notificationsEnabled),
-                        child: const Text('通知トグル'),
+                        child: Text(l10n.toggleNotification),
                       ),
                       CupertinoButton(
                         onPressed: () =>
                             _updateDarkMode(!settings.darkModeEnabled),
-                        child: const Text('ダークモードトグル'),
+                        child: Text(l10n.toggleDarkMode),
                       ),
                     ],
                   ),
@@ -243,11 +256,11 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
                   size: 48,
                 ),
                 const SizedBox(height: 16),
-                Text('エラー: $error'),
+                Text(l10n.errorMessage('$error')),
                 const SizedBox(height: 16),
                 CupertinoButton(
                   onPressed: () => ref.invalidate(userSettingsStreamProvider),
-                  child: const Text('再読み込み'),
+                  child: Text(l10n.reload),
                 ),
               ],
             ),
@@ -290,6 +303,7 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
   }
 
   Future<void> _saveSettings(UserSettings currentSettings) async {
+    final l10n = AppLocalizations.of(context);
     final viewModel = ref.read(userSettingsViewModelProvider.notifier);
 
     final newSettings = currentSettings.copyWith(
@@ -302,39 +316,41 @@ class _SettingsTestScreenState extends ConsumerState<SettingsTestScreen> {
     try {
       await viewModel.saveSettings(newSettings);
       if (mounted) {
-        showCupertinoToast(context, 'Firestoreに保存しました');
+        showCupertinoToast(context, l10n.savedToFirestore);
       }
     } catch (e) {
       if (mounted) {
-        showCupertinoToast(context, '保存エラー: $e', isError: true);
+        showCupertinoToast(context, l10n.saveError('$e'), isError: true);
       }
     }
   }
 
   Future<void> _updateNotification(bool enabled) async {
+    final l10n = AppLocalizations.of(context);
     final viewModel = ref.read(userSettingsViewModelProvider.notifier);
     try {
       await viewModel.updateNotificationEnabled(enabled);
       if (mounted) {
-        showCupertinoToast(context, '通知設定を更新しました');
+        showCupertinoToast(context, l10n.notificationUpdated);
       }
     } catch (e) {
       if (mounted) {
-        showCupertinoToast(context, 'エラー: $e', isError: true);
+        showCupertinoToast(context, l10n.errorMessage('$e'), isError: true);
       }
     }
   }
 
   Future<void> _updateDarkMode(bool enabled) async {
+    final l10n = AppLocalizations.of(context);
     final viewModel = ref.read(userSettingsViewModelProvider.notifier);
     try {
       await viewModel.updateDarkModeEnabled(enabled);
       if (mounted) {
-        showCupertinoToast(context, 'ダークモード設定を更新しました');
+        showCupertinoToast(context, l10n.darkModeUpdated);
       }
     } catch (e) {
       if (mounted) {
-        showCupertinoToast(context, 'エラー: $e', isError: true);
+        showCupertinoToast(context, l10n.errorMessage('$e'), isError: true);
       }
     }
   }

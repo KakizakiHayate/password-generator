@@ -8,7 +8,8 @@ import 'core/services/crashlytics_service.dart';
 import 'core/services/preferences_service.dart';
 import 'core/theme/cupertino_theme.dart';
 import 'firebase_options.dart';
-import 'views/screens/settings_test_screen.dart';
+import 'l10n/app_localizations.dart';
+import 'routing/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,48 +51,19 @@ Future<void> _initializeServices(ProviderContainer container) async {
   await Future.wait(futures);
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const CupertinoApp(
-      title: 'Flutter Starter Kit',
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
+    return CupertinoApp.router(
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       theme: appTheme,
-      home: HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Flutter Starter Kit'),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Hello Starter Kit', style: TextStyle(fontSize: 24)),
-            const SizedBox(height: 32),
-            CupertinoButton.filled(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute<void>(
-                    builder: (context) => const SettingsTestScreen(),
-                  ),
-                );
-              },
-              child: const Text('Firestore動作テスト'),
-            ),
-          ],
-        ),
-      ),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: router,
     );
   }
 }

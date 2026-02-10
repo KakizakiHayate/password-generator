@@ -1,0 +1,47 @@
+{
+  "@@locale": "ja",
+  "appTitle": "Flutter Starter Kit",
+  "homeGreeting": "Hello Starter Kit",
+  "firestoreTestButton": "Firestore動作テスト",
+  "settingsTestTitle": "Firestore動作テスト",
+  "settingsTestDescription": "Firestore動作確認",
+  "settingsTestGuide": "設定を変更して「保存」ボタンを押すと、Firestoreに保存されます。\nアプリを再起動しても設定が保持されることを確認できます。",
+  "firestoreCurrentValues": "Firestoreの現在値（リアルタイム）",
+  "labelDisplayName": "表示名",
+  "labelNotification": "通知",
+  "labelDarkMode": "ダークモード",
+  "labelLanguage": "言語",
+  "labelDocumentId": "ドキュメントID",
+  "on": "ON",
+  "off": "OFF",
+  "editSettings": "設定を変更",
+  "placeholderDisplayName": "表示名を入力してください",
+  "switchNotification": "通知を有効にする",
+  "switchDarkMode": "ダークモードを有効にする",
+  "languageJa": "日本語",
+  "languageEn": "English",
+  "saveToFirestore": "Firestoreに保存",
+  "individualUpdateTest": "個別更新テスト",
+  "toggleNotification": "通知トグル",
+  "toggleDarkMode": "ダークモードトグル",
+  "savedToFirestore": "Firestoreに保存しました",
+  "saveError": "保存エラー: {error}",
+  "@saveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationUpdated": "通知設定を更新しました",
+  "darkModeUpdated": "ダークモード設定を更新しました",
+  "errorMessage": "エラー: {error}",
+  "@errorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reload": "再読み込み"
+}

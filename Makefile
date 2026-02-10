@@ -1,4 +1,4 @@
-.PHONY: help setup lint lint-fix test test-coverage build-ios build-ipa build-apk build-appbundle run get clean upgrade check ci
+.PHONY: help setup lint lint-fix test test-coverage build-ios build-ipa build-apk build-appbundle run restart get clean upgrade check ci
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -65,6 +65,20 @@ run:
 	@echo "🚀 Running app in debug mode..."
 	@flutter run
 
+## クリーンビルド + 実行（flutter clean → pub get → pod install → run）
+restart:
+	@echo "🧹 Cleaning project..."
+	@flutter clean
+	@echo ""
+	@echo "📦 Getting dependencies..."
+	@flutter pub get
+	@echo ""
+	@echo "🍎 Installing CocoaPods..."
+	@cd ios && pod install && cd ..
+	@echo ""
+	@echo "🚀 Running app in debug mode..."
+	@flutter run
+
 ## flutter pub get
 get:
 	@echo "📦 Getting dependencies..."
@@ -127,6 +141,7 @@ help:
 	@echo ""
 	@echo "  Development:"
 	@echo "    make run           - Run app in debug mode"
+	@echo "    make restart     - Clean build + pod install + run"
 	@echo "    make get           - Get dependencies"
 	@echo "    make clean         - Clean and get dependencies"
 	@echo "    make upgrade       - Upgrade packages"

@@ -40,9 +40,10 @@ This file provides guidance to Claude Code when working with code in this reposi
 - Apple Human Interface Guidelinesに準拠
 
 ### 多言語対応
-- 日本語（デフォルト）
+- 日本語（デフォルト・フォールバック）
 - 英語
-- flutter_localizations使用
+- flutter_localizations + gen_l10n 使用
+- デバイスの言語設定を自動判定
 
 ---
 
@@ -61,7 +62,9 @@ lib/
 │   ├── services/                # 共通サービス
 │   │   ├── analytics_service.dart
 │   │   ├── auth_service.dart
-│   │   └── crashlytics_service.dart
+│   │   ├── crashlytics_service.dart
+│   │   ├── firestore_service.dart
+│   │   └── preferences_service.dart
 │   ├── theme/                   # テーマ設定
 │   │   └── cupertino_theme.dart
 │   ├── utils/                   # ユーティリティ関数
@@ -81,8 +84,14 @@ lib/
 │
 ├── providers/                   # ドメイン固有Provider
 │
+├── l10n/                        # 多言語対応（ARB + 自動生成）
+│   ├── app_ja.arb               # 日本語（テンプレート）
+│   ├── app_en.arb               # 英語
+│   └── app_localizations.dart   # 自動生成（flutter gen-l10n）
+│
 ├── routing/                     # ルーティング
-│   └── app_router.dart          # go_router設定
+│   ├── app_router.dart          # go_router設定（Riverpod codegen）
+│   └── analytics_route_observer.dart # 画面遷移のAnalytics記録
 │
 └── validators/                  # バリデーション
 ```
@@ -158,7 +167,8 @@ users/
 ### ルーティング（go_router）
 
 ```dart
-final appRouterProvider = Provider<GoRouter>((ref) {
+@Riverpod(keepAlive: true)
+GoRouter appRouter(Ref ref) {
   final analyticsService = ref.watch(analyticsServiceProvider);
 
   return GoRouter(
@@ -168,12 +178,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         name: 'home',
-        builder: (context, state) => const HomeScreen(),
+        pageBuilder: (context, state) => const CupertinoPage(
+          child: HomeScreen(),
+        ),
       ),
       // 他のルート...
     ],
   );
-});
+}
 ```
 
 ### main.dart構成
@@ -200,16 +212,10 @@ class MyApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
 
     return CupertinoApp.router(
-      theme: /* CupertinoThemeData */,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ja', 'JP'),
-        Locale('en', 'US'),
-      ],
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+      theme: appTheme,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       routerConfig: router,
     );
   }
@@ -242,18 +248,18 @@ class MyApp extends ConsumerWidget {
 ### UI/UX
 | 機能 | 状態 | 説明 |
 |------|------|------|
-| Cupertinoテーマ | 未実装 | iOS風UIテーマ |
-| go_router | 未実装 | 宣言的ルーティング + Analytics連携 |
+| Cupertinoテーマ | 実装済み | iOS風UIテーマ |
+| go_router | 実装済み | 宣言的ルーティング + Analytics連携 |
 
 ### 国際化（i18n）
 | 機能 | 状態 | 説明 |
 |------|------|------|
-| 多言語対応 | 未実装 | 日本語/英語切り替え |
+| 多言語対応 | 実装済み | 日本語/英語（デバイス言語自動判定） |
 
 ### セットアップ自動化
 | 機能 | 状態 | 説明 |
 |------|------|------|
-| setup.sh | 未実装 | プロジェクト名、バンドルID、Firebase設定の自動化 |
+| setup.sh | 実装済み | プロジェクト名、バンドルID、Firebase設定の自動化 |
 
 ---
 
