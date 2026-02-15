@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCWbJ1yE5Xew_X1H91QDyeeUWCcHZE6VZg',
-    appId: '1:210239125404:android:de90eec4b952a6a4e4ba59',
-    messagingSenderId: '210239125404',
-    projectId: 'flutter-fast-starter',
-    storageBucket: 'flutter-fast-starter.firebasestorage.app',
+    apiKey: 'AIzaSyCylJgkF3SNYkmt6hhNrJkyWmDPt9ICYb0',
+    appId: '1:627416234811:android:4138e720c392ecfc1e551e',
+    messagingSenderId: '627416234811',
+    projectId: 'password-generator-3899',
+    storageBucket: 'password-generator-3899.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBaagAmxrIAKwrxZU5vDbb263mnQc_RE3o',
-    appId: '1:210239125404:ios:502b23570a9fcba6e4ba59',
-    messagingSenderId: '210239125404',
-    projectId: 'flutter-fast-starter',
-    storageBucket: 'flutter-fast-starter.firebasestorage.app',
-    iosBundleId: 'com.h.dev.flutterFastStarter',
+    apiKey: 'AIzaSyAXelynVGw6TohXlpt4rz7hJVDHM_r3yl4',
+    appId: '1:627416234811:ios:e92a741f9f5113301e551e',
+    messagingSenderId: '627416234811',
+    projectId: 'password-generator-3899',
+    storageBucket: 'password-generator-3899.firebasestorage.app',
+    iosBundleId: 'com.h.dev.passwordGenerator',
   );
+
 }

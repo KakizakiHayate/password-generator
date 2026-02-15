@@ -1,7 +1,7 @@
 // 共通サービスの Provider を一括 export するバレルファイル
 //
 // 使用例:
-// import 'package:flutter_fast_starter/core/providers/service_providers.dart';
+// import 'package:password_generator/core/providers/service_providers.dart';
 // final auth = ref.read(authServiceProvider);
 
 export '../services/analytics_service.dart' show analyticsServiceProvider;

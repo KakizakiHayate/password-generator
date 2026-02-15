@@ -406,13 +406,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_fast_starter_lints:
-    dependency: "direct dev"
-    description:
-      path: flutter_fast_starter_lints
-      relative: true
-    source: path
-    version: "1.0.0"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -700,6 +693,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.0"
+  password_generator_lints:
+    dependency: "direct dev"
+    description:
+      path: password_generator_lints
+      relative: true
+    source: path
+    version: "1.0.0"
   path:
     dependency: transitive
     description:

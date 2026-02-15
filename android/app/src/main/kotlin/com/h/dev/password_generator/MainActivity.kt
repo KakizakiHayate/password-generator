@@ -1,4 +1,4 @@
-package com.h.dev.flutter_fast_starter
+package com.h.dev.password_generator
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,4 +1,4 @@
-name: flutter_fast_starter_lints
+name: password_generator_lints
 description: Custom lint rules for Flutter Fast Starter
 version: 1.0.0
 publish_to: none

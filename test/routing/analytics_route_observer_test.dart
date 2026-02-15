@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_fast_starter/routing/analytics_route_observer.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:password_generator/routing/analytics_route_observer.dart';
 
 /// テスト用の AnalyticsService スタブ
 ///

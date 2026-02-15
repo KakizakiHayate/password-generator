@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_fast_starter/l10n/app_localizations.dart';
-import 'package:flutter_fast_starter/views/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:password_generator/l10n/app_localizations.dart';
+import 'package:password_generator/views/screens/home_screen.dart';
 
 void main() {
   testWidgets('HomeScreen displays correctly', (WidgetTester tester) async {
