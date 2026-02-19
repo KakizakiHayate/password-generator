@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -17,6 +18,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// スライダー操作中の一時的な値（null の場合は設定値を使用）
   double? _sliderValue;
+
+  /// 候補セクションの展開状態
+  bool _isCandidatesExpanded = false;
+
+  /// コピーフィードバック中のパスワード（null でない場合は「コピーしました」を表示）
+  /// キー: 'main' or 候補のインデックス文字列
+  final Set<String> _copiedKeys = {};
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +51,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Future<void> _copyToClipboard(String text, String key) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    await HapticFeedback.mediumImpact();
+    setState(() {
+      _copiedKeys.add(key);
+    });
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        setState(() {
+          _copiedKeys.remove(key);
+        });
+      }
+    });
+  }
+
   Widget _buildContent(
     BuildContext context,
     PasswordGeneratorState state,
@@ -54,12 +77,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         children: [
-          // パスワード表示エリア
+          // パスワード表示エリア（タップでコピー）
           _PasswordDisplayCard(
             password: state.password,
             strength: state.strength,
             l10n: l10n,
+            isCopied: _copiedKeys.contains('main'),
+            onTap: () => _copyToClipboard(state.password, 'main'),
           ),
+          const SizedBox(height: 16),
+
+          // 候補セクション
+          _buildCandidatesSection(state, l10n),
           const SizedBox(height: 24),
 
           // 文字数スライダー
@@ -100,6 +129,140 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCandidatesSection(
+    PasswordGeneratorState state,
+    AppLocalizations l10n,
+  ) {
+    return Column(
+      children: [
+        // 折りたたみトグル
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: () {
+            setState(() {
+              _isCandidatesExpanded = !_isCandidatesExpanded;
+            });
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                l10n.viewOtherCandidates,
+                style: const TextStyle(fontSize: 14),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                _isCandidatesExpanded
+                    ? CupertinoIcons.chevron_up
+                    : CupertinoIcons.chevron_down,
+                size: 14,
+              ),
+            ],
+          ),
+        ),
+
+        // 展開時の候補リスト
+        if (_isCandidatesExpanded) ...[
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: CupertinoColors.systemBackground,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: CupertinoColors.systemGrey4),
+            ),
+            child: Column(
+              children: [
+                ...state.candidates.asMap().entries.map((entry) {
+                  final key = entry.key.toString();
+                  final isCopied = _copiedKeys.contains(key);
+                  return _buildCandidateRow(
+                    entry.value,
+                    key,
+                    isCopied,
+                    l10n,
+                    isLast: entry.key == state.candidates.length - 1,
+                  );
+                }),
+                // 候補を再生成ボタン
+                CupertinoButton(
+                  onPressed: () {
+                    ref
+                        .read(passwordGeneratorViewModelProvider.notifier)
+                        .regenerateCandidates();
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(CupertinoIcons.refresh, size: 16),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.regenerateCandidates,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildCandidateRow(
+    String password,
+    String key,
+    bool isCopied,
+    AppLocalizations l10n, {
+    required bool isLast,
+  }) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  password,
+                  style: const TextStyle(
+                    fontFamily: 'Courier',
+                    fontFamilyFallback: ['monospace'],
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              CupertinoButton(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: Size.zero,
+                onPressed: isCopied
+                    ? null
+                    : () => _copyToClipboard(password, key),
+                child: Text(
+                  isCopied ? l10n.copiedMessage : l10n.copyButton,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isCopied
+                        ? CupertinoColors.systemGrey
+                        : CupertinoTheme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (!isLast)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Container(height: 0.5, color: CupertinoColors.systemGrey4),
+          ),
+      ],
     );
   }
 
@@ -228,63 +391,81 @@ class _PasswordDisplayCard extends StatelessWidget {
     required this.password,
     required this.strength,
     required this.l10n,
+    required this.isCopied,
+    required this.onTap,
   });
 
   final String password;
   final PasswordStrength strength;
   final AppLocalizations l10n;
+  final bool isCopied;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: CupertinoColors.systemGrey4),
-      ),
-      child: Column(
-        children: [
-          // パスワード表示（等幅フォント）
-          Text(
-            password,
-            style: const TextStyle(
-              fontFamily: 'Courier',
-              fontFamilyFallback: ['monospace'],
-              fontSize: 18,
-              letterSpacing: 0.5,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-
-          // 強度バー + テキストラベル
-          Row(
-            children: [
-              Expanded(child: _StrengthBar(level: strength.level)),
-              const SizedBox(width: 12),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemBackground,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: CupertinoColors.systemGrey4),
+        ),
+        child: Column(
+          children: [
+            // パスワード表示（等幅フォント）/ コピーフィードバック
+            if (isCopied)
               Text(
-                _strengthText(strength.level),
-                style: TextStyle(
-                  fontSize: 14,
+                l10n.copiedMessage,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: CupertinoColors.systemGreen,
                   fontWeight: FontWeight.w600,
-                  color: _strengthColor(strength.level),
                 ),
+                textAlign: TextAlign.center,
+              )
+            else
+              Text(
+                password,
+                style: const TextStyle(
+                  fontFamily: 'Courier',
+                  fontFamilyFallback: ['monospace'],
+                  fontSize: 18,
+                  letterSpacing: 0.5,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 16),
 
-          // 解読推定時間
-          Text(
-            '${l10n.crackTimePrefix} ${strength.crackTimeDisplay}',
-            style: const TextStyle(
-              fontSize: 13,
-              color: CupertinoColors.systemGrey,
+            // 強度バー + テキストラベル
+            Row(
+              children: [
+                Expanded(child: _StrengthBar(level: strength.level)),
+                const SizedBox(width: 12),
+                Text(
+                  _strengthText(strength.level),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: _strengthColor(strength.level),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+
+            // 解読推定時間
+            Text(
+              '${l10n.crackTimePrefix} ${strength.crackTimeDisplay}',
+              style: const TextStyle(
+                fontSize: 13,
+                color: CupertinoColors.systemGrey,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

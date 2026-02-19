@@ -1,53 +1,37 @@
-import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_generator/core/services/auth_service.dart';
-import 'package:password_generator/core/services/firestore_service.dart';
 import 'package:password_generator/l10n/app_localizations.dart';
-import 'package:password_generator/services/password_generator_service.dart';
-import 'package:password_generator/services/password_strength_service.dart';
-import 'package:password_generator/services/settings_service.dart';
-import 'package:password_generator/services/user_service.dart';
+import 'package:password_generator/models/generator_settings.dart';
+import 'package:password_generator/models/password_strength.dart';
+import 'package:password_generator/viewmodels/password_generator_viewmodel.dart';
 import 'package:password_generator/views/screens/home_screen.dart';
-
-/// テスト用の認証サービス
-class FakeAuthService implements AuthService {
-  @override
-  String? get userId => 'test-user-123';
-
-  @override
-  bool get isAuthenticated => true;
-
-  @override
-  Future<void> ensureAuthenticated() async {}
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
 
 void main() {
   testWidgets('HomeScreen displays correctly', (WidgetTester tester) async {
-    final fakeFirestore = FakeFirebaseFirestore();
-    final firestoreService = FirestoreService(firestore: fakeFirestore);
+    const testState = PasswordGeneratorState(
+      password: 'TestPassword123!',
+      settings: GeneratorSettings(),
+      strength: PasswordStrength(
+        level: StrengthLevel.veryStrong,
+        entropy: 80.0,
+        crackTimeDisplay: '1,000 years',
+      ),
+      candidates: [
+        'Candidate1!',
+        'Candidate2@',
+        'Candidate3#',
+        'Candidate4\$',
+        'Candidate5%',
+      ],
+    );
 
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          firestoreServiceProvider.overrideWithValue(firestoreService),
-          authServiceProvider.overrideWithValue(FakeAuthService()),
-          settingsServiceProvider.overrideWithValue(
-            SettingsService(firestoreService: firestoreService),
-          ),
-          userServiceProvider.overrideWithValue(
-            UserService(firestoreService: firestoreService),
-          ),
-          passwordGeneratorServiceProvider.overrideWithValue(
-            PasswordGeneratorService(),
-          ),
-          passwordStrengthServiceProvider.overrideWithValue(
-            PasswordStrengthService(),
-          ),
+          passwordGeneratorViewModelProvider.overrideWith(() {
+            return _FakePasswordGeneratorViewModel(testState);
+          }),
         ],
         child: const CupertinoApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -57,13 +41,24 @@ void main() {
       ),
     );
 
-    // 非同期ViewModel読み込みを待つ（pumpAndSettleはActivityIndicatorで止まるため pump を使用）
+    // 非同期ViewModel読み込みを待つ
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump();
 
-    // ナビゲーションバーのタイトル（テスト環境はデフォルト英語ロケール）
-    expect(find.text('Password Generator'), findsOneWidget);
-    // 生成ボタン
-    expect(find.text('Generate'), findsOneWidget);
+    // パスワード表示（メインコンテンツ領域）
+    expect(find.text('TestPassword123!'), findsOneWidget);
+    // CupertinoActivityIndicator が存在しない（ロード完了）
+    expect(find.byType(CupertinoActivityIndicator), findsNothing);
+    // CupertinoSlider が存在する（設定セクション）
+    expect(find.byType(CupertinoSlider), findsOneWidget);
   });
+}
+
+/// テスト用の ViewModel（Firestoreアクセス不要）
+class _FakePasswordGeneratorViewModel extends PasswordGeneratorViewModel {
+  _FakePasswordGeneratorViewModel(this._state);
+  final PasswordGeneratorState _state;
+
+  @override
+  Future<PasswordGeneratorState> build() async => _state;
 }

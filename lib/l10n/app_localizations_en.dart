@@ -66,6 +66,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get symbolSelectionError => 'Please select at least one symbol';
 
   @override
+  String get copiedMessage => 'Copied';
+
+  @override
+  String get copyButton => 'Copy';
+
+  @override
+  String get viewOtherCandidates => 'View other candidates';
+
+  @override
+  String get regenerateCandidates => 'Regenerate candidates';
+
+  @override
   String get homeGreeting => 'Hello Starter Kit';
 
   @override

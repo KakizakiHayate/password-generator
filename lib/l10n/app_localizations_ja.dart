@@ -66,6 +66,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get symbolSelectionError => '記号を1つ以上選択してください';
 
   @override
+  String get copiedMessage => 'コピーしました';
+
+  @override
+  String get copyButton => 'コピー';
+
+  @override
+  String get viewOtherCandidates => '他の候補を見る';
+
+  @override
+  String get regenerateCandidates => '候補を再生成';
+
+  @override
   String get homeGreeting => 'Hello Starter Kit';
 
   @override

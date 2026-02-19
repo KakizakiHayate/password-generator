@@ -212,6 +212,30 @@ abstract class AppLocalizations {
   /// **'記号を1つ以上選択してください'**
   String get symbolSelectionError;
 
+  /// No description provided for @copiedMessage.
+  ///
+  /// In ja, this message translates to:
+  /// **'コピーしました'**
+  String get copiedMessage;
+
+  /// No description provided for @copyButton.
+  ///
+  /// In ja, this message translates to:
+  /// **'コピー'**
+  String get copyButton;
+
+  /// No description provided for @viewOtherCandidates.
+  ///
+  /// In ja, this message translates to:
+  /// **'他の候補を見る'**
+  String get viewOtherCandidates;
+
+  /// No description provided for @regenerateCandidates.
+  ///
+  /// In ja, this message translates to:
+  /// **'候補を再生成'**
+  String get regenerateCandidates;
+
   /// No description provided for @homeGreeting.
   ///
   /// In ja, this message translates to:
