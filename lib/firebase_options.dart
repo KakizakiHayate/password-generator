@@ -65,5 +65,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'password-generator-3899.firebasestorage.app',
     iosBundleId: 'com.h.dev.passwordGenerator',
   );
-
 }
