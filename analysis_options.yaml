@@ -46,7 +46,6 @@ linter:
     # null安全
     - avoid_null_checks_in_equality_operators
     - null_check_on_nullable_type_parameter
-    - avoid_returning_null_for_future
 
     # コード構造・可読性
     - directives_ordering
