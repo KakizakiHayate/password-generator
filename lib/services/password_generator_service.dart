@@ -135,12 +135,11 @@ class PasswordGeneratorService {
   String _buildSymbolPool(GeneratorSettings settings) {
     final buffer = StringBuffer();
     for (final entry in settings.customSymbols.entries) {
-      if (entry.value) {
-        if (settings.excludeAmbiguous && _ambiguousChars.contains(entry.key)) {
-          continue;
-        }
-        buffer.write(entry.key);
+      if (!entry.value) continue;
+      if (settings.excludeAmbiguous && _ambiguousChars.contains(entry.key)) {
+        continue;
       }
+      buffer.write(entry.key);
     }
     return buffer.toString();
   }

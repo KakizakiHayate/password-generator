@@ -84,12 +84,11 @@ class PasswordStrengthService {
   int _countSymbols(GeneratorSettings settings) {
     var count = 0;
     for (final entry in settings.customSymbols.entries) {
-      if (entry.value) {
-        if (settings.excludeAmbiguous && _ambiguousChars.contains(entry.key)) {
-          continue;
-        }
-        count++;
+      if (!entry.value) continue;
+      if (settings.excludeAmbiguous && _ambiguousChars.contains(entry.key)) {
+        continue;
       }
+      count++;
     }
     return count;
   }
