@@ -182,6 +182,36 @@ abstract class AppLocalizations {
   /// **'生成する'**
   String get generateButton;
 
+  /// No description provided for @symbolSelectionTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'記号の選択'**
+  String get symbolSelectionTitle;
+
+  /// No description provided for @doneButton.
+  ///
+  /// In ja, this message translates to:
+  /// **'完了'**
+  String get doneButton;
+
+  /// No description provided for @selectAllSymbols.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて選択'**
+  String get selectAllSymbols;
+
+  /// No description provided for @deselectAllSymbols.
+  ///
+  /// In ja, this message translates to:
+  /// **'すべて解除'**
+  String get deselectAllSymbols;
+
+  /// No description provided for @symbolSelectionError.
+  ///
+  /// In ja, this message translates to:
+  /// **'記号を1つ以上選択してください'**
+  String get symbolSelectionError;
+
   /// No description provided for @homeGreeting.
   ///
   /// In ja, this message translates to:

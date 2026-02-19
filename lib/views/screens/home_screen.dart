@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/password_strength.dart';
 import '../../viewmodels/password_generator_viewmodel.dart';
+import 'symbol_selection_screen.dart';
 
 /// メイン画面
 class HomeScreen extends ConsumerStatefulWidget {
@@ -195,7 +196,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return CupertinoButton(
       padding: const EdgeInsets.symmetric(vertical: 8),
       onPressed: () {
-        // Issue #6 で実装
+        showCupertinoModalPopup<void>(
+          context: context,
+          builder: (_) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: const SymbolSelectionScreen(),
+          ),
+        );
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

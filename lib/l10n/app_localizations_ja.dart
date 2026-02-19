@@ -51,6 +51,21 @@ class AppLocalizationsJa extends AppLocalizations {
   String get generateButton => '生成する';
 
   @override
+  String get symbolSelectionTitle => '記号の選択';
+
+  @override
+  String get doneButton => '完了';
+
+  @override
+  String get selectAllSymbols => 'すべて選択';
+
+  @override
+  String get deselectAllSymbols => 'すべて解除';
+
+  @override
+  String get symbolSelectionError => '記号を1つ以上選択してください';
+
+  @override
   String get homeGreeting => 'Hello Starter Kit';
 
   @override
