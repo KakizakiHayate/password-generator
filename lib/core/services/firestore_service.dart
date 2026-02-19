@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -13,8 +15,12 @@ FirestoreService firestoreService(Ref ref) {
 ///
 /// ユーザーデータの保存・取得を簡単に行えるラッパーを提供します。
 /// コレクション構造: users/{userId}/{subcollection}/{docId}
+/// トップレベルコレクション: {collectionName}/{docId}
 class FirestoreService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirestoreService({FirebaseFirestore? firestore})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
+
+  final FirebaseFirestore _firestore;
 
   /// Firestoreインスタンスを取得（テスト用）
   FirebaseFirestore get instance => _firestore;
@@ -82,6 +88,11 @@ class FirestoreService {
     Map<String, dynamic> data, {
     bool merge = true,
   }) async {
+    developer.log(
+      '[DEBUG] setDocument: users/$userId/$collectionName/$docId',
+      name: 'FirestoreService',
+    );
+    developer.log('[DEBUG] data: $data', name: 'FirestoreService');
     final dataWithTimestamp = {
       ...data,
       'updatedAt': FieldValue.serverTimestamp(),
@@ -91,6 +102,7 @@ class FirestoreService {
       userId,
       collectionName,
     ).doc(docId).set(dataWithTimestamp, SetOptions(merge: merge));
+    developer.log('[DEBUG] setDocument 完了', name: 'FirestoreService');
   }
 
   /// ドキュメントを取得
@@ -182,6 +194,50 @@ class FirestoreService {
       if (data == null) return null;
       return {'id': snapshot.id, ...data};
     });
+  }
+
+  // ============================================================
+  // トップレベルコレクション操作
+  // ============================================================
+
+  /// トップレベルコレクションのドキュメント参照を取得
+  DocumentReference<Map<String, dynamic>> topLevelDoc(
+    String collectionName,
+    String docId,
+  ) {
+    return _firestore.collection(collectionName).doc(docId);
+  }
+
+  /// トップレベルコレクションのドキュメントを取得
+  Future<Map<String, dynamic>?> getTopLevelDocument(
+    String collectionName,
+    String docId,
+  ) async {
+    final doc = await topLevelDoc(collectionName, docId).get();
+    if (!doc.exists) return null;
+    return doc.data();
+  }
+
+  /// トップレベルコレクションのドキュメントを保存（マージモード）
+  Future<void> setTopLevelDocument(
+    String collectionName,
+    String docId,
+    Map<String, dynamic> data, {
+    bool merge = true,
+  }) async {
+    await topLevelDoc(
+      collectionName,
+      docId,
+    ).set(data, SetOptions(merge: merge));
+  }
+
+  /// トップレベルコレクションのドキュメントを更新
+  Future<void> updateTopLevelDocument(
+    String collectionName,
+    String docId,
+    Map<String, dynamic> data,
+  ) async {
+    await topLevelDoc(collectionName, docId).update(data);
   }
 
   // ============================================================
