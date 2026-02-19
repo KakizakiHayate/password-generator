@@ -38,6 +38,10 @@ settings/                               # 設定エンティティ
 
 両コレクションとも **Firebase Auth の匿名認証で発行される `userId`** をドキュメント ID として使用する。`users/{userId}` と `settings/{userId}` は同一ユーザーを指す。
 
+### FirestoreService の拡張
+
+既存の `FirestoreService` はサブコレクション構造（`users/{userId}/{collectionName}/{docId}`）を前提としているため、トップレベルコレクション（`users/{userId}`, `settings/{userId}`）への読み書き用メソッドを追加する必要がある。
+
 ---
 
 ## データモデル（Freezed）
