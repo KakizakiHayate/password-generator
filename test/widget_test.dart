@@ -1,11 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:password_generator/core/services/auth_service.dart';
 import 'package:password_generator/l10n/app_localizations.dart';
 import 'package:password_generator/models/generator_settings.dart';
 import 'package:password_generator/models/password_strength.dart';
 import 'package:password_generator/viewmodels/password_generator_viewmodel.dart';
 import 'package:password_generator/views/screens/home_screen.dart';
+
+/// テスト用の認証サービス
+class FakeAuthService implements AuthService {
+  @override
+  String? get userId => 'test-user-123';
+
+  @override
+  bool get isAuthenticated => true;
+
+  @override
+  Future<void> ensureAuthenticated() async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 void main() {
   testWidgets('HomeScreen displays correctly', (WidgetTester tester) async {
