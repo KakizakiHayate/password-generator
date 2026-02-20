@@ -51,6 +51,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generateButton => 'Generate';
 
   @override
+  String get symbolSelectionTitle => 'Symbol Selection';
+
+  @override
+  String get doneButton => 'Done';
+
+  @override
+  String get selectAllSymbols => 'Select All';
+
+  @override
+  String get deselectAllSymbols => 'Deselect All';
+
+  @override
+  String get symbolSelectionError => 'Please select at least one symbol';
+
+  @override
   String get homeGreeting => 'Hello Starter Kit';
 
   @override
