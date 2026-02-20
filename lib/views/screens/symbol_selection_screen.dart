@@ -16,30 +16,18 @@ class SymbolSelectionScreen extends ConsumerStatefulWidget {
 class _SymbolSelectionScreenState extends ConsumerState<SymbolSelectionScreen> {
   /// ローカルの記号選択状態（モーダル内で編集し、完了時に保存）
   late Map<String, bool> _symbols;
-  bool _isInitialized = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialState = ref.read(passwordGeneratorViewModelProvider).value!;
+    _symbols = Map<String, bool>.from(initialState.settings.customSymbols);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final asyncState = ref.watch(passwordGeneratorViewModelProvider);
-
-    // 初回ビルド時にViewModelの状態から記号選択を初期化
-    if (!_isInitialized) {
-      final state = asyncState.valueOrNull;
-      if (state != null) {
-        _symbols = Map<String, bool>.from(state.settings.customSymbols);
-        _isInitialized = true;
-      }
-    }
-
-    if (!_isInitialized) {
-      return const CupertinoPageScaffold(
-        navigationBar: CupertinoNavigationBar(),
-        child: Center(child: CupertinoActivityIndicator()),
-      );
-    }
-
     final isAllSelected = _symbols.values.every((v) => v);
 
     return CupertinoPageScaffold(
@@ -62,9 +50,7 @@ class _SymbolSelectionScreenState extends ConsumerState<SymbolSelectionScreen> {
               onPressed: () {
                 setState(() {
                   final newValue = !isAllSelected;
-                  for (final key in _symbols.keys) {
-                    _symbols[key] = newValue;
-                  }
+                  _symbols.updateAll((_, _) => newValue);
                   _errorMessage = null;
                 });
               },
