@@ -49,6 +49,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
   }
 
   static const _candidateCount = 5;
+  static const _reviewPromptThreshold = 3;
 
   PasswordGeneratorState _generateState(GeneratorSettings settings) {
     final generatorService = ref.read(passwordGeneratorServiceProvider);
@@ -121,7 +122,8 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     final user = await userSvc.get(userId);
     if (user == null) return false;
 
-    return user.generationCount >= 3 && !user.reviewPromptShown;
+    return user.generationCount >= _reviewPromptThreshold &&
+        !user.reviewPromptShown;
   }
 
   /// レビュー依頼表示済みとしてマークする
@@ -150,7 +152,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
 
     if (current.settings.useUppercase) {
       final svc = ref.read(passwordGeneratorServiceProvider);
-      if (!svc.canToggleOff(current.settings, 'useUppercase')) return;
+      if (!svc.canToggleOff(current.settings, ToggleType.useUppercase)) return;
     }
 
     final newSettings = current.settings.copyWith(
@@ -166,7 +168,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
 
     if (current.settings.useLowercase) {
       final svc = ref.read(passwordGeneratorServiceProvider);
-      if (!svc.canToggleOff(current.settings, 'useLowercase')) return;
+      if (!svc.canToggleOff(current.settings, ToggleType.useLowercase)) return;
     }
 
     final newSettings = current.settings.copyWith(
@@ -182,7 +184,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
 
     if (current.settings.useNumbers) {
       final svc = ref.read(passwordGeneratorServiceProvider);
-      if (!svc.canToggleOff(current.settings, 'useNumbers')) return;
+      if (!svc.canToggleOff(current.settings, ToggleType.useNumbers)) return;
     }
 
     final newSettings = current.settings.copyWith(
@@ -198,7 +200,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
 
     if (current.settings.useSymbols) {
       final svc = ref.read(passwordGeneratorServiceProvider);
-      if (!svc.canToggleOff(current.settings, 'useSymbols')) return;
+      if (!svc.canToggleOff(current.settings, ToggleType.useSymbols)) return;
     }
 
     final newSettings = current.settings.copyWith(

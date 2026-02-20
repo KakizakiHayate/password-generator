@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,15 +20,17 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const double _modalHeightRatio = 0.6;
+
   /// スライダー操作中の一時的な値（null の場合は設定値を使用）
   double? _sliderValue;
 
   /// 候補セクションの展開状態
   bool _isCandidatesExpanded = false;
 
-  /// コピーフィードバック中のパスワード（null でない場合は「コピーしました」を表示）
+  /// コピーフィードバック中のタイマー管理
   /// キー: 'main' or 候補のインデックス文字列
-  final Set<String> _copiedKeys = {};
+  final Map<String, Timer> _copiedTimers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +46,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             showCupertinoModalPopup<void>(
               context: context,
               builder: (_) => SizedBox(
-                height: MediaQuery.of(context).size.height * 0.6,
+                height: MediaQuery.of(context).size.height * _modalHeightRatio,
                 child: const AppInfoScreen(),
               ),
             );
@@ -57,6 +61,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Center(child: Text(l10n.errorMessage(error.toString()))),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    for (final timer in _copiedTimers.values) {
+      timer.cancel();
+    }
+    super.dispose();
   }
 
   Future<void> _checkReviewPrompt(PasswordGeneratorViewModel notifier) async {
@@ -74,16 +86,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await Clipboard.setData(ClipboardData(text: text));
     await HapticFeedback.mediumImpact();
     ref.read(passwordGeneratorViewModelProvider.notifier).logPasswordCopied();
-    setState(() {
-      _copiedKeys.add(key);
-    });
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    // 同じキーの既存タイマーをキャンセル
+    _copiedTimers[key]?.cancel();
+    _copiedTimers[key] = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
-          _copiedKeys.remove(key);
+          _copiedTimers.remove(key);
         });
       }
     });
+    setState(() {});
   }
 
   Widget _buildContent(
@@ -102,7 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             password: state.password,
             strength: state.strength,
             l10n: l10n,
-            isCopied: _copiedKeys.contains('main'),
+            isCopied: _copiedTimers.containsKey('main'),
             onTap: () => _copyToClipboard(state.password, 'main'),
           ),
           const SizedBox(height: 16),
@@ -198,8 +210,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               children: [
                 ...state.candidates.asMap().entries.map((entry) {
-                  final key = entry.key.toString();
-                  final isCopied = _copiedKeys.contains(key);
+                  final key = 'candidate_${entry.key}';
+                  final isCopied = _copiedTimers.containsKey(key);
                   return _buildCandidateRow(
                     entry.value,
                     key,
@@ -370,7 +382,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 16)),
+          Text(label, style: CupertinoTheme.of(context).textTheme.textStyle),
           CupertinoSwitch(value: value, onChanged: onChanged),
         ],
       ),
@@ -384,7 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         showCupertinoModalPopup<void>(
           context: context,
           builder: (_) => SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
+            height: MediaQuery.of(context).size.height * _modalHeightRatio,
             child: const SymbolSelectionScreen(),
           ),
         );
