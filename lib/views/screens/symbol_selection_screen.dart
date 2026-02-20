@@ -21,7 +21,8 @@ class _SymbolSelectionScreenState extends ConsumerState<SymbolSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    final initialState = ref.read(passwordGeneratorViewModelProvider).value!;
+    final initialState = ref.read(passwordGeneratorViewModelProvider).value;
+    if (initialState == null) return;
     _symbols = Map<String, bool>.from(initialState.settings.customSymbols);
   }
 
