@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/password_strength.dart';
 import '../../viewmodels/password_generator_viewmodel.dart';
+import 'app_info_screen.dart';
 import 'symbol_selection_screen.dart';
 
 /// メイン画面
@@ -18,6 +20,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const double _modalHeightRatio = 0.6;
+
   /// スライダー操作中の一時的な値（null の場合は設定値を使用）
   double? _sliderValue;
 
@@ -39,7 +43,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () {
-            // Issue #8 で実装
+            showCupertinoModalPopup<void>(
+              context: context,
+              builder: (_) => SizedBox(
+                height: MediaQuery.of(context).size.height * _modalHeightRatio,
+                child: const AppInfoScreen(),
+              ),
+            );
           },
           child: const Icon(CupertinoIcons.gear),
         ),
@@ -61,9 +71,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  Future<void> _checkReviewPrompt(PasswordGeneratorViewModel notifier) async {
+    final shouldShow = await notifier.shouldShowReviewPrompt();
+    if (!shouldShow) return;
+
+    final inAppReview = InAppReview.instance;
+    if (await inAppReview.isAvailable()) {
+      await inAppReview.requestReview();
+    }
+    await notifier.markReviewPromptShown();
+  }
+
   Future<void> _copyToClipboard(String text, String key) async {
     await Clipboard.setData(ClipboardData(text: text));
     await HapticFeedback.mediumImpact();
+    ref.read(passwordGeneratorViewModelProvider.notifier).logPasswordCopied();
     // 同じキーの既存タイマーをキャンセル
     _copiedTimers[key]?.cancel();
     _copiedTimers[key] = Timer(const Duration(milliseconds: 1500), () {
@@ -129,10 +151,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SizedBox(
             width: double.infinity,
             child: CupertinoButton.filled(
-              onPressed: () {
-                ref
-                    .read(passwordGeneratorViewModelProvider.notifier)
-                    .generate();
+              onPressed: () async {
+                final notifier = ref.read(
+                  passwordGeneratorViewModelProvider.notifier,
+                );
+                await notifier.generate();
+                await _checkReviewPrompt(notifier);
               },
               child: Text(l10n.generateButton),
             ),
@@ -358,7 +382,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 16)),
+          Text(label, style: CupertinoTheme.of(context).textTheme.textStyle),
           CupertinoSwitch(value: value, onChanged: onChanged),
         ],
       ),
@@ -372,7 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         showCupertinoModalPopup<void>(
           context: context,
           builder: (_) => SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
+            height: MediaQuery.of(context).size.height * _modalHeightRatio,
             child: const SymbolSelectionScreen(),
           ),
         );

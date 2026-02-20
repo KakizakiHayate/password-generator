@@ -10,16 +10,15 @@ import 'package:password_generator/views/screens/symbol_selection_screen.dart';
 /// テスト用の ViewModel（即座に状態を返す）
 class _FakePasswordGeneratorViewModel extends PasswordGeneratorViewModel {
   @override
-  Future<PasswordGeneratorState> build() async =>
-      const PasswordGeneratorState(
-        password: 'TestPassword!',
-        settings: GeneratorSettings(),
-        strength: PasswordStrength(
-          entropy: 80.0,
-          level: StrengthLevel.veryStrong,
-          crackTimeDisplay: '1000年',
-        ),
-      );
+  Future<PasswordGeneratorState> build() async => const PasswordGeneratorState(
+    password: 'TestPassword!',
+    settings: GeneratorSettings(),
+    strength: PasswordStrength(
+      entropy: 80.0,
+      level: StrengthLevel.veryStrong,
+      crackTimeDisplay: '1000年',
+    ),
+  );
 }
 
 /// Provider を事前ロードし、SymbolSelectionScreen を表示するテストアプリ

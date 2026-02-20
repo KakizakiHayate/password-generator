@@ -49,6 +49,12 @@ Future<void> _initializeServices(ProviderContainer container) async {
   }
 
   await Future.wait(futures);
+
+  // 4. app_opened イベントを送信
+  if (userId != null) {
+    final analyticsService = container.read(analyticsServiceProvider);
+    analyticsService.logEvent(name: 'app_opened');
+  }
 }
 
 class MyApp extends ConsumerWidget {

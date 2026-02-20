@@ -78,6 +78,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get regenerateCandidates => '候補を再生成';
 
   @override
+  String get appInfoTitle => '情報';
+
+  @override
+  String get aboutApp => 'アプリについて';
+
+  @override
+  String get privacyPolicy => 'プライバシーポリシー';
+
+  @override
   String get homeGreeting => 'Hello Starter Kit';
 
   @override
