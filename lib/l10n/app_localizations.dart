@@ -101,8 +101,86 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In ja, this message translates to:
-  /// **'Flutter Starter Kit'**
+  /// **'パスワードジェネレーター'**
   String get appTitle;
+
+  /// No description provided for @strengthWeak.
+  ///
+  /// In ja, this message translates to:
+  /// **'弱い'**
+  String get strengthWeak;
+
+  /// No description provided for @strengthFair.
+  ///
+  /// In ja, this message translates to:
+  /// **'普通'**
+  String get strengthFair;
+
+  /// No description provided for @strengthStrong.
+  ///
+  /// In ja, this message translates to:
+  /// **'強い'**
+  String get strengthStrong;
+
+  /// No description provided for @strengthVeryStrong.
+  ///
+  /// In ja, this message translates to:
+  /// **'非常に強い'**
+  String get strengthVeryStrong;
+
+  /// No description provided for @crackTimePrefix.
+  ///
+  /// In ja, this message translates to:
+  /// **'解読推定:'**
+  String get crackTimePrefix;
+
+  /// No description provided for @characterCount.
+  ///
+  /// In ja, this message translates to:
+  /// **'文字数'**
+  String get characterCount;
+
+  /// No description provided for @uppercaseLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'大文字(A-Z)'**
+  String get uppercaseLabel;
+
+  /// No description provided for @lowercaseLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'小文字(a-z)'**
+  String get lowercaseLabel;
+
+  /// No description provided for @numbersLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'数字(0-9)'**
+  String get numbersLabel;
+
+  /// No description provided for @symbolsLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'記号'**
+  String get symbolsLabel;
+
+  /// No description provided for @excludeAmbiguousLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'紛らわしい文字を除外'**
+  String get excludeAmbiguousLabel;
+
+  /// No description provided for @customizeSymbolsLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'記号をカスタム選択'**
+  String get customizeSymbolsLabel;
+
+  /// No description provided for @generateButton.
+  ///
+  /// In ja, this message translates to:
+  /// **'生成する'**
+  String get generateButton;
 
   /// No description provided for @homeGreeting.
   ///

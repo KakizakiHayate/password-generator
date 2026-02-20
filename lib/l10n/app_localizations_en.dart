@@ -9,7 +9,46 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Flutter Starter Kit';
+  String get appTitle => 'Password Generator';
+
+  @override
+  String get strengthWeak => 'Weak';
+
+  @override
+  String get strengthFair => 'Fair';
+
+  @override
+  String get strengthStrong => 'Strong';
+
+  @override
+  String get strengthVeryStrong => 'Very Strong';
+
+  @override
+  String get crackTimePrefix => 'Est. crack time:';
+
+  @override
+  String get characterCount => 'Length';
+
+  @override
+  String get uppercaseLabel => 'Uppercase (A-Z)';
+
+  @override
+  String get lowercaseLabel => 'Lowercase (a-z)';
+
+  @override
+  String get numbersLabel => 'Numbers (0-9)';
+
+  @override
+  String get symbolsLabel => 'Symbols';
+
+  @override
+  String get excludeAmbiguousLabel => 'Exclude ambiguous characters';
+
+  @override
+  String get customizeSymbolsLabel => 'Customize symbols';
+
+  @override
+  String get generateButton => 'Generate';
 
   @override
   String get homeGreeting => 'Hello Starter Kit';

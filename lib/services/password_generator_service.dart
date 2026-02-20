@@ -35,6 +35,8 @@ const String _lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
 /// 数字の文字セット
 const String _digitChars = '0123456789';
 
+/// 文字種トグルの種類
+enum ToggleType { useUppercase, useLowercase, useNumbers, useSymbols }
 /// パスワード生成サービス
 ///
 /// 文字種フィルタ（F-01）、紛らわしい文字の除外（F-02）、
@@ -78,9 +80,9 @@ class PasswordGeneratorService {
   ///
   /// 現在ONになっている文字種が1つだけの場合、
   /// そのトグルをOFFにすることを防止する。
-  bool canToggleOff(GeneratorSettings settings, String toggleName) {
+  bool canToggleOff(GeneratorSettings settings, ToggleType toggle) {
     final activeCount = _countActiveToggles(settings);
-    final isCurrentlyOn = _isToggleOn(settings, toggleName);
+    final isCurrentlyOn = _isToggleOn(settings, toggle);
 
     // 現在ONで、かつONが1つしかない場合はOFFにできない
     return !(isCurrentlyOn && activeCount <= 1);
@@ -97,13 +99,12 @@ class PasswordGeneratorService {
   }
 
   /// 指定されたトグルがONかどうかを返す
-  bool _isToggleOn(GeneratorSettings settings, String toggleName) {
-    return switch (toggleName) {
-      'useUppercase' => settings.useUppercase,
-      'useLowercase' => settings.useLowercase,
-      'useNumbers' => settings.useNumbers,
-      'useSymbols' => settings.useSymbols,
-      _ => false,
+  bool _isToggleOn(GeneratorSettings settings, ToggleType toggle) {
+    return switch (toggle) {
+      ToggleType.useUppercase => settings.useUppercase,
+      ToggleType.useLowercase => settings.useLowercase,
+      ToggleType.useNumbers => settings.useNumbers,
+      ToggleType.useSymbols => settings.useSymbols,
     };
   }
 

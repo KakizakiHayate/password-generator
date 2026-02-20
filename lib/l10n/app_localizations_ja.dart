@@ -9,7 +9,46 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get appTitle => 'Flutter Starter Kit';
+  String get appTitle => 'パスワードジェネレーター';
+
+  @override
+  String get strengthWeak => '弱い';
+
+  @override
+  String get strengthFair => '普通';
+
+  @override
+  String get strengthStrong => '強い';
+
+  @override
+  String get strengthVeryStrong => '非常に強い';
+
+  @override
+  String get crackTimePrefix => '解読推定:';
+
+  @override
+  String get characterCount => '文字数';
+
+  @override
+  String get uppercaseLabel => '大文字(A-Z)';
+
+  @override
+  String get lowercaseLabel => '小文字(a-z)';
+
+  @override
+  String get numbersLabel => '数字(0-9)';
+
+  @override
+  String get symbolsLabel => '記号';
+
+  @override
+  String get excludeAmbiguousLabel => '紛らわしい文字を除外';
+
+  @override
+  String get customizeSymbolsLabel => '記号をカスタム選択';
+
+  @override
+  String get generateButton => '生成する';
 
   @override
   String get homeGreeting => 'Hello Starter Kit';

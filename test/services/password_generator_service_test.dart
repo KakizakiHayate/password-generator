@@ -61,16 +61,16 @@ void main() {
         useSymbols: false,
       );
 
-      expect(service.canToggleOff(settings, 'useUppercase'), false);
+      expect(service.canToggleOff(settings, ToggleType.useUppercase), false);
     });
 
     test('T-1.5 補足: 複数ONの場合はOFFにできる', () {
       const settings = GeneratorSettings();
 
-      expect(service.canToggleOff(settings, 'useUppercase'), true);
-      expect(service.canToggleOff(settings, 'useLowercase'), true);
-      expect(service.canToggleOff(settings, 'useNumbers'), true);
-      expect(service.canToggleOff(settings, 'useSymbols'), true);
+      expect(service.canToggleOff(settings, ToggleType.useUppercase), true);
+      expect(service.canToggleOff(settings, ToggleType.useLowercase), true);
+      expect(service.canToggleOff(settings, ToggleType.useNumbers), true);
+      expect(service.canToggleOff(settings, ToggleType.useSymbols), true);
     });
 
     test('T-1.6: 同じ設定で2回生成する', () {
