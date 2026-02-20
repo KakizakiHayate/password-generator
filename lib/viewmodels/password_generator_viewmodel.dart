@@ -15,11 +15,15 @@ class PasswordGeneratorState {
     required this.password,
     required this.settings,
     required this.strength,
+    this.candidates = const [],
   });
 
   final String password;
   final GeneratorSettings settings;
   final PasswordStrength strength;
+
+  /// 5件の候補パスワード
+  final List<String> candidates;
 }
 
 /// メイン画面の ViewModel
@@ -42,17 +46,24 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     return _generateState(settings);
   }
 
+  static const _candidateCount = 5;
+
   PasswordGeneratorState _generateState(GeneratorSettings settings) {
     final generatorService = ref.read(passwordGeneratorServiceProvider);
     final strengthService = ref.read(passwordStrengthServiceProvider);
 
     final password = generatorService.generate(settings);
     final strength = strengthService.calculate(settings);
+    final candidates = List.generate(
+      _candidateCount,
+      (_) => generatorService.generate(settings),
+    );
 
     return PasswordGeneratorState(
       password: password,
       settings: settings,
       strength: strength,
+      candidates: candidates,
     );
   }
 
@@ -157,6 +168,27 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
       excludeAmbiguous: !current.settings.excludeAmbiguous,
     );
     await _saveAndRegenerate(newSettings);
+  }
+
+  /// 候補のみ再生成する（メインパスワードは変更しない）
+  Future<void> regenerateCandidates() async {
+    final current = state.valueOrNull;
+    if (current == null) return;
+
+    final generatorService = ref.read(passwordGeneratorServiceProvider);
+    final candidates = List.generate(
+      _candidateCount,
+      (_) => generatorService.generate(current.settings),
+    );
+
+    state = AsyncData(
+      PasswordGeneratorState(
+        password: current.password,
+        settings: current.settings,
+        strength: current.strength,
+        candidates: candidates,
+      ),
+    );
   }
 
   /// カスタム記号の選択状態を更新する
