@@ -37,7 +37,6 @@ const String _digitChars = '0123456789';
 
 /// 文字種トグルの種類
 enum ToggleType { useUppercase, useLowercase, useNumbers, useSymbols }
-
 /// パスワード生成サービス
 ///
 /// 文字種フィルタ（F-01）、紛らわしい文字の除外（F-02）、
