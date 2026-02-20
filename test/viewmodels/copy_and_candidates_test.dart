@@ -1,6 +1,7 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:password_generator/core/services/analytics_service.dart';
 import 'package:password_generator/core/services/auth_service.dart';
 import 'package:password_generator/core/services/firestore_service.dart';
 import 'package:password_generator/services/password_generator_service.dart';
@@ -8,6 +9,18 @@ import 'package:password_generator/services/password_strength_service.dart';
 import 'package:password_generator/services/settings_service.dart';
 import 'package:password_generator/services/user_service.dart';
 import 'package:password_generator/viewmodels/password_generator_viewmodel.dart';
+
+/// テスト用の Analytics サービス（何もしない）
+class FakeAnalyticsService implements AnalyticsService {
+  @override
+  Future<void> logEvent({
+    required String name,
+    Map<String, Object>? parameters,
+  }) async {}
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
 
 /// テスト用の認証サービス
 class FakeAuthService implements AuthService {
@@ -36,6 +49,7 @@ void main() {
       overrides: [
         firestoreServiceProvider.overrideWithValue(firestoreService),
         authServiceProvider.overrideWithValue(FakeAuthService()),
+        analyticsServiceProvider.overrideWithValue(FakeAnalyticsService()),
         settingsServiceProvider.overrideWithValue(
           SettingsService(firestoreService: firestoreService),
         ),

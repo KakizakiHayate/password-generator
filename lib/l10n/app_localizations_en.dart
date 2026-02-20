@@ -78,6 +78,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get regenerateCandidates => 'Regenerate candidates';
 
   @override
+  String get appInfoTitle => 'Info';
+
+  @override
+  String get aboutApp => 'About this app';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
   String get homeGreeting => 'Hello Starter Kit';
 
   @override

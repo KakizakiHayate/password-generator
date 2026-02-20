@@ -236,6 +236,24 @@ abstract class AppLocalizations {
   /// **'候補を再生成'**
   String get regenerateCandidates;
 
+  /// No description provided for @appInfoTitle.
+  ///
+  /// In ja, this message translates to:
+  /// **'情報'**
+  String get appInfoTitle;
+
+  /// No description provided for @aboutApp.
+  ///
+  /// In ja, this message translates to:
+  /// **'アプリについて'**
+  String get aboutApp;
+
+  /// No description provided for @privacyPolicy.
+  ///
+  /// In ja, this message translates to:
+  /// **'プライバシーポリシー'**
+  String get privacyPolicy;
+
   /// No description provided for @homeGreeting.
   ///
   /// In ja, this message translates to:

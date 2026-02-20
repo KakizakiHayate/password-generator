@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:in_app_review/in_app_review.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/password_strength.dart';
 import '../../viewmodels/password_generator_viewmodel.dart';
+import 'app_info_screen.dart';
 import 'symbol_selection_screen.dart';
 
 /// メイン画面
@@ -37,7 +39,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () {
-            // Issue #8 で実装
+            showCupertinoModalPopup<void>(
+              context: context,
+              builder: (_) => SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: const AppInfoScreen(),
+              ),
+            );
           },
           child: const Icon(CupertinoIcons.gear),
         ),
@@ -51,9 +59,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Future<void> _checkReviewPrompt(PasswordGeneratorViewModel notifier) async {
+    final shouldShow = await notifier.shouldShowReviewPrompt();
+    if (!shouldShow) return;
+
+    final inAppReview = InAppReview.instance;
+    if (await inAppReview.isAvailable()) {
+      await inAppReview.requestReview();
+    }
+    await notifier.markReviewPromptShown();
+  }
+
   Future<void> _copyToClipboard(String text, String key) async {
     await Clipboard.setData(ClipboardData(text: text));
     await HapticFeedback.mediumImpact();
+    ref.read(passwordGeneratorViewModelProvider.notifier).logPasswordCopied();
     setState(() {
       _copiedKeys.add(key);
     });
@@ -119,10 +139,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SizedBox(
             width: double.infinity,
             child: CupertinoButton.filled(
-              onPressed: () {
-                ref
-                    .read(passwordGeneratorViewModelProvider.notifier)
-                    .generate();
+              onPressed: () async {
+                final notifier = ref.read(
+                  passwordGeneratorViewModelProvider.notifier,
+                );
+                await notifier.generate();
+                await _checkReviewPrompt(notifier);
               },
               child: Text(l10n.generateButton),
             ),

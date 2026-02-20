@@ -1,11 +1,13 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../core/services/analytics_service.dart';
 import '../core/services/auth_service.dart';
 import '../models/generator_settings.dart';
 import '../models/password_strength.dart';
 import '../services/password_generator_service.dart';
 import '../services/password_strength_service.dart';
 import '../services/settings_service.dart';
+import '../services/user_service.dart';
 
 part 'password_generator_viewmodel.g.dart';
 
@@ -67,7 +69,10 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     );
   }
 
-  Future<void> _saveAndRegenerate(GeneratorSettings settings) async {
+  Future<void> _saveAndRegenerate(
+    GeneratorSettings settings, {
+    String? changeType,
+  }) async {
     final auth = ref.read(authServiceProvider);
     final settingsService = ref.read(settingsServiceProvider);
 
@@ -75,15 +80,58 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     if (userId == null) return;
 
     await settingsService.save(userId, settings);
+    if (changeType != null) {
+      ref
+          .read(analyticsServiceProvider)
+          .logEvent(
+            name: 'settings_changed',
+            parameters: {'change_type': changeType},
+          );
+    }
     state = AsyncData(_generateState(settings));
   }
 
   /// パスワードを再生成する（設定は変更しない）
+  ///
+  /// generationCount をインクリメントし、Analytics イベントを送信する。
   Future<void> generate() async {
     final current = state.valueOrNull;
     if (current == null) return;
 
+    final auth = ref.read(authServiceProvider);
+    final userId = auth.userId;
+    if (userId != null) {
+      final userSvc = ref.read(userServiceProvider);
+      await userSvc.incrementGenerationCount(userId);
+      ref.read(analyticsServiceProvider).logEvent(name: 'password_generated');
+    }
+
     state = AsyncData(_generateState(current.settings));
+  }
+
+  /// レビュー依頼を表示すべきかを判定する
+  ///
+  /// generationCount が 3 かつ reviewPromptShown が false の場合に true を返す。
+  Future<bool> shouldShowReviewPrompt() async {
+    final auth = ref.read(authServiceProvider);
+    final userId = auth.userId;
+    if (userId == null) return false;
+
+    final userSvc = ref.read(userServiceProvider);
+    final user = await userSvc.get(userId);
+    if (user == null) return false;
+
+    return user.generationCount >= 3 && !user.reviewPromptShown;
+  }
+
+  /// レビュー依頼表示済みとしてマークする
+  Future<void> markReviewPromptShown() async {
+    final auth = ref.read(authServiceProvider);
+    final userId = auth.userId;
+    if (userId == null) return;
+
+    final userSvc = ref.read(userServiceProvider);
+    await userSvc.markReviewPromptShown(userId);
   }
 
   /// 文字数を変更する
@@ -92,7 +140,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     if (current == null) return;
 
     final newSettings = current.settings.copyWith(length: length);
-    await _saveAndRegenerate(newSettings);
+    await _saveAndRegenerate(newSettings, changeType: 'length');
   }
 
   /// 大文字トグルを切り替える
@@ -108,7 +156,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     final newSettings = current.settings.copyWith(
       useUppercase: !current.settings.useUppercase,
     );
-    await _saveAndRegenerate(newSettings);
+    await _saveAndRegenerate(newSettings, changeType: 'uppercase');
   }
 
   /// 小文字トグルを切り替える
@@ -124,7 +172,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     final newSettings = current.settings.copyWith(
       useLowercase: !current.settings.useLowercase,
     );
-    await _saveAndRegenerate(newSettings);
+    await _saveAndRegenerate(newSettings, changeType: 'lowercase');
   }
 
   /// 数字トグルを切り替える
@@ -140,7 +188,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     final newSettings = current.settings.copyWith(
       useNumbers: !current.settings.useNumbers,
     );
-    await _saveAndRegenerate(newSettings);
+    await _saveAndRegenerate(newSettings, changeType: 'numbers');
   }
 
   /// 記号トグルを切り替える
@@ -156,7 +204,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     final newSettings = current.settings.copyWith(
       useSymbols: !current.settings.useSymbols,
     );
-    await _saveAndRegenerate(newSettings);
+    await _saveAndRegenerate(newSettings, changeType: 'symbols');
   }
 
   /// 紛らわしい文字除外トグルを切り替える
@@ -167,7 +215,7 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     final newSettings = current.settings.copyWith(
       excludeAmbiguous: !current.settings.excludeAmbiguous,
     );
-    await _saveAndRegenerate(newSettings);
+    await _saveAndRegenerate(newSettings, changeType: 'exclude_ambiguous');
   }
 
   /// 候補のみ再生成する（メインパスワードは変更しない）
@@ -191,12 +239,17 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     );
   }
 
+  /// パスワードコピーの Analytics イベントを送信する
+  void logPasswordCopied() {
+    ref.read(analyticsServiceProvider).logEvent(name: 'password_copied');
+  }
+
   /// カスタム記号の選択状態を更新する
   Future<void> updateCustomSymbols(Map<String, bool> symbols) async {
     final current = state.valueOrNull;
     if (current == null) return;
 
     final newSettings = current.settings.copyWith(customSymbols: symbols);
-    await _saveAndRegenerate(newSettings);
+    await _saveAndRegenerate(newSettings, changeType: 'custom_symbols');
   }
 }
