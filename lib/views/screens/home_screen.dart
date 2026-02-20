@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,9 +24,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// 候補セクションの展開状態
   bool _isCandidatesExpanded = false;
 
-  /// コピーフィードバック中のパスワード（null でない場合は「コピーしました」を表示）
+  /// コピーフィードバック中のタイマー管理
   /// キー: 'main' or 候補のインデックス文字列
-  final Set<String> _copiedKeys = {};
+  final Map<String, Timer> _copiedTimers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -51,19 +53,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  @override
+  void dispose() {
+    for (final timer in _copiedTimers.values) {
+      timer.cancel();
+    }
+    super.dispose();
+  }
+
   Future<void> _copyToClipboard(String text, String key) async {
     await Clipboard.setData(ClipboardData(text: text));
     await HapticFeedback.mediumImpact();
-    setState(() {
-      _copiedKeys.add(key);
-    });
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    // 同じキーの既存タイマーをキャンセル
+    _copiedTimers[key]?.cancel();
+    _copiedTimers[key] = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) {
         setState(() {
-          _copiedKeys.remove(key);
+          _copiedTimers.remove(key);
         });
       }
     });
+    setState(() {});
   }
 
   Widget _buildContent(
@@ -82,7 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             password: state.password,
             strength: state.strength,
             l10n: l10n,
-            isCopied: _copiedKeys.contains('main'),
+            isCopied: _copiedTimers.containsKey('main'),
             onTap: () => _copyToClipboard(state.password, 'main'),
           ),
           const SizedBox(height: 16),
@@ -176,8 +186,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               children: [
                 ...state.candidates.asMap().entries.map((entry) {
-                  final key = entry.key.toString();
-                  final isCopied = _copiedKeys.contains(key);
+                  final key = 'candidate_${entry.key}';
+                  final isCopied = _copiedTimers.containsKey(key);
                   return _buildCandidateRow(
                     entry.value,
                     key,
