@@ -87,6 +87,26 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
                       ),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Container(
+                      height: 0.5,
+                      color: CupertinoColors.systemGrey4,
+                    ),
+                  ),
+                  // お問い合わせ
+                  CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: _openContactForm,
+                    child: _buildRow(
+                      label: l10n.contactUs,
+                      trailing: const Icon(
+                        CupertinoIcons.chevron_right,
+                        size: 18,
+                        color: CupertinoColors.systemGrey,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -112,6 +132,13 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
   Future<void> _openPrivacyPolicy() async {
     // TODO: 実際のプライバシーポリシーURLに差し替える
     final url = Uri.parse('https://example.com/privacy-policy');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _openContactForm() async {
+    final url = Uri.parse('https://forms.gle/BTMaDFCTMQdYrbNR6');
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }

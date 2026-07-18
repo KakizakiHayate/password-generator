@@ -9,7 +9,7 @@ class AppLocalizationsJa extends AppLocalizations {
   AppLocalizationsJa([String locale = 'ja']) : super(locale);
 
   @override
-  String get appTitle => 'パスワードジェネレーター';
+  String get appTitle => '1秒パスワード生成';
 
   @override
   String get strengthWeak => '弱い';
@@ -177,4 +177,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get reload => '再読み込み';
+
+  @override
+  String get customizeLabel => 'カスタマイズ';
+
+  @override
+  String get contactUs => 'お問い合わせ';
 }

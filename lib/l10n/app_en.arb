@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Password Generator",
+  "appTitle": "1-Sec Password",
   "strengthWeak": "Weak",
   "strengthFair": "Fair",
   "strengthStrong": "Strong",
@@ -54,5 +54,7 @@
   "notificationUpdated": "Notification setting updated",
   "darkModeUpdated": "Dark mode setting updated",
   "errorMessage": "Error: {error}",
-  "reload": "Reload"
+  "reload": "Reload",
+  "customizeLabel": "Customize",
+  "contactUs": "Contact Us"
 }
