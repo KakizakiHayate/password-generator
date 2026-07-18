@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Password Generator';
+  String get appTitle => '1-Sec Password';
 
   @override
   String get strengthWeak => 'Weak';
@@ -177,4 +177,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reload => 'Reload';
+
+  @override
+  String get customizeLabel => 'Customize';
+
+  @override
+  String get contactUs => 'Contact Us';
 }

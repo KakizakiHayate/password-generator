@@ -5,8 +5,16 @@ import '../../l10n/app_localizations.dart';
 import '../../viewmodels/password_generator_viewmodel.dart';
 
 /// 記号カスタム選択モーダル画面
+///
+/// [initialSymbols] が渡された場合はそれを初期値として使用し、
+/// 「完了」時に `pop(Map<String, bool>)` で結果を返す。
+/// [initialSymbols] が渡されない場合は ViewModel から読み取り、
+/// 「完了」時に ViewModel に直接保存する（従来の動作）。
 class SymbolSelectionScreen extends ConsumerStatefulWidget {
-  const SymbolSelectionScreen({super.key});
+  const SymbolSelectionScreen({super.key, this.initialSymbols});
+
+  /// 外部から渡す初期記号選択状態（カスタマイズシートから開く場合に使用）
+  final Map<String, bool>? initialSymbols;
 
   @override
   ConsumerState<SymbolSelectionScreen> createState() =>
@@ -21,9 +29,13 @@ class _SymbolSelectionScreenState extends ConsumerState<SymbolSelectionScreen> {
   @override
   void initState() {
     super.initState();
-    final initialState = ref.read(passwordGeneratorViewModelProvider).value;
-    if (initialState == null) return;
-    _symbols = Map<String, bool>.from(initialState.settings.customSymbols);
+    if (widget.initialSymbols case final initial?) {
+      _symbols = Map<String, bool>.from(initial);
+    } else {
+      final initialState = ref.read(passwordGeneratorViewModelProvider).value;
+      if (initialState == null) return;
+      _symbols = Map<String, bool>.from(initialState.settings.customSymbols);
+    }
   }
 
   @override
@@ -34,6 +46,7 @@ class _SymbolSelectionScreenState extends ConsumerState<SymbolSelectionScreen> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: Text(l10n.symbolSelectionTitle),
+        automaticallyImplyLeading: false,
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: _onDone,
@@ -137,11 +150,15 @@ class _SymbolSelectionScreenState extends ConsumerState<SymbolSelectionScreen> {
       return;
     }
 
-    // ViewModelに保存
-    ref
-        .read(passwordGeneratorViewModelProvider.notifier)
-        .updateCustomSymbols(_symbols);
-
-    Navigator.of(context).pop();
+    if (widget.initialSymbols != null) {
+      // カスタマイズシートから開かれた場合: 結果を返す
+      Navigator.of(context).pop(_symbols);
+    } else {
+      // 直接開かれた場合: ViewModelに保存（従来の動作）
+      ref
+          .read(passwordGeneratorViewModelProvider.notifier)
+          .updateCustomSymbols(_symbols);
+      Navigator.of(context).pop();
+    }
   }
 }

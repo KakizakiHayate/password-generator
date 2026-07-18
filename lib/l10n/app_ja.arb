@@ -1,6 +1,6 @@
 {
   "@@locale": "ja",
-  "appTitle": "パスワードジェネレーター",
+  "appTitle": "1秒パスワード生成",
   "strengthWeak": "弱い",
   "strengthFair": "普通",
   "strengthStrong": "強い",
@@ -68,5 +68,7 @@
       }
     }
   },
-  "reload": "再読み込み"
+  "reload": "再読み込み",
+  "customizeLabel": "カスタマイズ",
+  "contactUs": "お問い合わせ"
 }

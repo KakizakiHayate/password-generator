@@ -246,6 +246,11 @@ class PasswordGeneratorViewModel extends _$PasswordGeneratorViewModel {
     ref.read(analyticsServiceProvider).logEvent(name: 'password_copied');
   }
 
+  /// 設定を一括適用する（カスタマイズシートの「完了」時に使用）
+  Future<void> applySettings(GeneratorSettings settings) async {
+    await _saveAndRegenerate(settings, changeType: 'apply_settings');
+  }
+
   /// カスタム記号の選択状態を更新する
   Future<void> updateCustomSymbols(Map<String, bool> symbols) async {
     final current = state.valueOrNull;

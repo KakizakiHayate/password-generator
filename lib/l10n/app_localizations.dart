@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In ja, this message translates to:
-  /// **'パスワードジェネレーター'**
+  /// **'1秒パスワード生成'**
   String get appTitle;
 
   /// No description provided for @strengthWeak.
@@ -427,6 +427,18 @@ abstract class AppLocalizations {
   /// In ja, this message translates to:
   /// **'再読み込み'**
   String get reload;
+
+  /// No description provided for @customizeLabel.
+  ///
+  /// In ja, this message translates to:
+  /// **'カスタマイズ'**
+  String get customizeLabel;
+
+  /// No description provided for @contactUs.
+  ///
+  /// In ja, this message translates to:
+  /// **'お問い合わせ'**
+  String get contactUs;
 }
 
 class _AppLocalizationsDelegate

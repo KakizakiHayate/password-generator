@@ -50,6 +50,7 @@ void main() {
           }),
         ],
         child: const CupertinoApp(
+          locale: Locale('ja'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: HomeScreen(),
@@ -65,8 +66,12 @@ void main() {
     expect(find.text('TestPassword123!'), findsOneWidget);
     // CupertinoActivityIndicator が存在しない（ロード完了）
     expect(find.byType(CupertinoActivityIndicator), findsNothing);
-    // CupertinoSlider が存在する（設定セクション）
-    expect(find.byType(CupertinoSlider), findsOneWidget);
+    // 生成ボタンが表示されている
+    expect(find.widgetWithText(CupertinoButton, '生成する'), findsOneWidget);
+    // コピーボタンが表示されている
+    expect(find.text('コピー'), findsOneWidget);
+    // カスタマイズリンクが表示されている
+    expect(find.text('カスタマイズ'), findsOneWidget);
   });
 }
 
