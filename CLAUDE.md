@@ -564,7 +564,7 @@ git merge origin/develop
 # コンフリクトがなければそのままプッシュ
 git push origin <ブランチ名>
 
-# 5. PRをsquashマージしてブランチ削除
+# 5. PRをsquashマージしてブランチ削除（release/* の PR は squash せず --merge を使う）
 gh pr merge <PR番号> --squash --delete-branch
 
 # 6. developブランチに切り替えて最新を取得
@@ -626,4 +626,32 @@ git push origin --delete <ブランチ名> 2>/dev/null || echo "リモートブ�
 
 ## ブランチルール
 
-[docs/git-rules.md](docs/git-rules.md) を参照。
+### ブランチ戦略: develop + release ブランチ（tanzam-flutter 方式）
+
+日常の開発は develop へ直接マージし、リリース時だけ `release/{x.y.z+n}` ブランチでバージョンを更新する。配布したコミットには `v{x.y.z+n}` タグを付け、`main` は配布済みの状態を指す。
+
+```
+develop（デフォルトブランチ）
+├── feature/issue-1-xxx → develop に squash マージ
+├── feature/issue-2-yyy → develop に squash マージ
+└── release/1.0.2+3     → develop に merge commit でマージ（タグ v1.0.2+3・main を更新）
+```
+
+### 開発フロー
+
+```
+1. develop から feature ブランチを切る
+2. 実装 + make check
+3. PR作成（→ develop 向け）
+4. CI通過 → squash マージ
+5. develop に戻って次の feature ブランチを切る
+```
+
+### リリースフロー
+
+- バージョン更新を develop に直接コミットしない。必ず `release/{x.y.z+n}` ブランチで行う
+- 手順・タグ・main の更新は [docs/git-rules.md](docs/git-rules.md) の「リリースとタグ」に従う
+
+### 参照
+
+[docs/git-rules.md](docs/git-rules.md)
